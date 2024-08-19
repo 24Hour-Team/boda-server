@@ -39,8 +39,13 @@ public class BookmarkService {
     북마크 폴더 생성 로직(유저당 최대 10개 제한)
      */
     public BookmarkFolderResponse createBookmarkFolder(BookmarkFolderCreateRequest request, String email) {
+        log.info("Creating bookmark folder for user: {}", email);
+
         User user = userRepository.findByEmail(email).orElseThrow(
-                () -> new UserException(UserErrorCode.USER_NOT_FOUND)
+                () -> {
+                    log.error("User not found: {}", email);
+                    return new UserException(UserErrorCode.USER_NOT_FOUND);
+                }
         );
 
         //북마크 폴더가 10개 이상인지 검사
@@ -58,8 +63,12 @@ public class BookmarkService {
     북마크 폴더 리스트 조회 로직
      */
     public List<BookmarkFolderResponse> getBookmarkFolders(String email) {
+        log.info("Fetching bookmark folders for user: {}", email);
         return bookmarkFolderRepository.findByUser(userRepository.findByEmail(email).orElseThrow(
-                        () -> new UserException(UserErrorCode.USER_NOT_FOUND)
+                        () -> {
+                            log.error("User not found: {}", email);
+                            return new UserException(UserErrorCode.USER_NOT_FOUND);
+                        }
                 )).stream()
                 .map(BookmarkFolderResponse::new)
                 .toList();
@@ -69,8 +78,12 @@ public class BookmarkService {
     북마크 폴더 삭제 로직
      */
     public void deleteBookmarkFolder(Long bookmarkFolderId, String email) {
+        log.info("Deleting bookmark folder with id: {} for user: {}", bookmarkFolderId, email);
         BookmarkFolder bookmarkFolder = bookmarkFolderRepository.findById(bookmarkFolderId).orElseThrow(
-                () -> new BookmarkException(BookmarkErrorCode.BOOKMARK_FOLDER_NOT_FOUND)
+                () -> {
+                    log.error("Bookmark folder not found with id: {}", bookmarkFolderId);
+                    return new BookmarkException(BookmarkErrorCode.BOOKMARK_FOLDER_NOT_FOUND);
+                }
         );
 
         // 해당 북마크 폴더가 유저의 소유가 맞는지 검사
@@ -83,11 +96,20 @@ public class BookmarkService {
     북마크 생성 로직(폴더당 최대 20개 제한)
      */
     public BookmarkResponse createBookmark(Long bookmarkFolderId, Long spotId, String email) {
+        log.info("Creating bookmark in folder: {} for spot: {} by user: {}", bookmarkFolderId, spotId, email);
+
         BookmarkFolder bookmarkFolder = bookmarkFolderRepository.findById(bookmarkFolderId).orElseThrow(
-                () -> new BookmarkException(BookmarkErrorCode.BOOKMARK_FOLDER_NOT_FOUND)
+                () -> {
+                    log.error("Bookmark folder not found with id: {}", bookmarkFolderId);
+                    return new BookmarkException(BookmarkErrorCode.BOOKMARK_FOLDER_NOT_FOUND);
+                }
         );
+
         Spot spot = spotRepository.findById(spotId).orElseThrow(
-                () -> new RecommendationException(RecommendationErrorCode.SPOT_NOT_FOUND)
+                () -> {
+                    log.error("Spot not found with id: {}", spotId);
+                    return new RecommendationException(RecommendationErrorCode.SPOT_NOT_FOUND);
+                }
         );
 
         // 해당 북마크 폴더가 유저의 소유가 맞는지 검사
@@ -111,8 +133,13 @@ public class BookmarkService {
     북마크 리스트 조회 로직
      */
     public List<BookmarkResponse> getBookmarks(Long bookmarkFolderId, String email) {
+        log.info("Fetching bookmarks for folder: {} by user: {}", bookmarkFolderId, email);
+
         BookmarkFolder bookmarkFolder = bookmarkFolderRepository.findById(bookmarkFolderId).orElseThrow(
-                () -> new BookmarkException(BookmarkErrorCode.BOOKMARK_FOLDER_NOT_FOUND)
+                () -> {
+                    log.error("Bookmark folder not found with id: {}", bookmarkFolderId);
+                    return new BookmarkException(BookmarkErrorCode.BOOKMARK_FOLDER_NOT_FOUND);
+                }
         );
 
         // 해당 북마크 폴더가 유저의 소유가 맞는지 검사
@@ -128,8 +155,13 @@ public class BookmarkService {
     북마크 삭제 로직
      */
     public void deleteBookmark(Long bookmarkId, String email) {
+        log.info("Deleting bookmark with id: {} by user: {}", bookmarkId, email);
+
         Bookmark bookmark = bookmarkRepository.findById(bookmarkId).orElseThrow(
-                () -> new BookmarkException(BookmarkErrorCode.BOOKMARK_NOT_FOUND)
+                () -> {
+                    log.error("Bookmark not found with id: {}", bookmarkId);
+                    return new BookmarkException(BookmarkErrorCode.BOOKMARK_NOT_FOUND);
+                }
         );
 
         // 해당 북마크 폴더가 유저의 소유가 맞는지 검사
@@ -141,28 +173,32 @@ public class BookmarkService {
     // 북마크 폴더 개수 제한 검증
     private void validateBookmarkFolderLimit(User user) {
         if (bookmarkFolderRepository.countByUser(user) >= 10) {
-            throw new BookmarkException(BookmarkErrorCode.CANNOT_CREATE_BOOKMARK_FOLDER);
+            log.warn("User: {} has reached the bookmark folder limit", user.getEmail());
+            throw new BookmarkException(BookmarkErrorCode.BOOKMARK_FOLDER_CREATION_LIMIT_EXCEEDED);
         }
     }
 
     // 사용자 접근 권한 검증
     private void validateUserAccess(BookmarkFolder bookmarkFolder, String email) {
         if (!bookmarkFolder.getUser().getEmail().equals(email)) {
-            throw new BookmarkException(BookmarkErrorCode.CANNOT_ACCESS_BOOKMARK_FOLDER);
+            log.warn("User: {} attempted to access folder: {} which does not belong to them", email, bookmarkFolder.getId());
+            throw new BookmarkException(BookmarkErrorCode.UNAUTHORIZED_BOOKMARK_FOLDER_ACCESS);
         }
     }
 
     // 북마크 개수 제한 검증
     private void validateBookmarkLimit(BookmarkFolder bookmarkFolder) {
         if (bookmarkRepository.countByBookmarkFolder(bookmarkFolder) >= 20) {
-            throw new BookmarkException(BookmarkErrorCode.CANNOT_CREATE_BOOKMARK);
+            log.warn("Bookmark folder: {} has reached the bookmark limit", bookmarkFolder.getId());
+            throw new BookmarkException(BookmarkErrorCode.BOOKMARK_CREATION_LIMIT_EXCEEDED);
         }
     }
 
     // 중복된 북마크 검증
     private void validateDuplicateBookmark(BookmarkFolder bookmarkFolder, Spot spot) {
         if (bookmarkRepository.findByBookmarkFolderAndSpot(bookmarkFolder, spot).isPresent()) {
-            throw new BookmarkException(BookmarkErrorCode.BOOKMARK_ALREADY_IN_FOLDER);
+            log.warn("Duplicate bookmark detected in folder: {} for spot: {}", bookmarkFolder.getId(), spot.getId());
+            throw new BookmarkException(BookmarkErrorCode.BOOKMARK_ALREADY_EXISTS_IN_FOLDER);
         }
     }
 }
