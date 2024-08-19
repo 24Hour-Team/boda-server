@@ -8,4 +8,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class BookmarkFolderCreateRequest {
     private String name;
+
+    public BookmarkFolderCreateRequest(String name) {
+        this.name = name;
+    }
 }
