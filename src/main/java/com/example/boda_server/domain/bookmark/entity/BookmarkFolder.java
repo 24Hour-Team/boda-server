@@ -37,8 +37,9 @@ public class BookmarkFolder extends BaseTimeEntity {
         this.user = user;
     }
 
-    public void addBookmark(Bookmark bookmark) {
+    public Bookmark addBookmark(Bookmark bookmark) {
         bookmarks.add(bookmark);
+        return bookmark;
     }
 
     public void removeBookmark(Bookmark bookmark) {

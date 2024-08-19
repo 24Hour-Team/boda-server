@@ -2,13 +2,13 @@ package com.example.boda_server.domain.bookmark.service;
 
 import com.example.boda_server.domain.bookmark.dto.request.BookmarkFolderCreateRequest;
 import com.example.boda_server.domain.bookmark.dto.response.BookmarkFolderResponse;
+import com.example.boda_server.domain.bookmark.dto.response.BookmarkResponse;
 import com.example.boda_server.domain.bookmark.entity.Bookmark;
 import com.example.boda_server.domain.bookmark.entity.BookmarkFolder;
 import com.example.boda_server.domain.bookmark.exception.BookmarkErrorCode;
 import com.example.boda_server.domain.bookmark.exception.BookmarkException;
 import com.example.boda_server.domain.bookmark.repository.BookmarkFolderRepository;
 import com.example.boda_server.domain.bookmark.repository.BookmarkRepository;
-import com.example.boda_server.domain.recommendation.dto.response.SpotResponse;
 import com.example.boda_server.domain.recommendation.entity.Spot;
 import com.example.boda_server.domain.recommendation.exception.RecommendationErrorCode;
 import com.example.boda_server.domain.recommendation.exception.RecommendationException;
@@ -23,7 +23,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -83,7 +82,7 @@ public class BookmarkService {
     /*
     북마크 생성 로직(폴더당 최대 20개 제한)
      */
-    public SpotResponse createBookmark(Long bookmarkFolderId, Long spotId, String email) {
+    public BookmarkResponse createBookmark(Long bookmarkFolderId, Long spotId, String email) {
         BookmarkFolder bookmarkFolder = bookmarkFolderRepository.findById(bookmarkFolderId).orElseThrow(
                 () -> new BookmarkException(BookmarkErrorCode.BOOKMARK_FOLDER_NOT_FOUND)
         );
@@ -100,20 +99,18 @@ public class BookmarkService {
         // 해당 폴더에 이미 해당 여행지 북마크가 있는지 검사
         validateDuplicateBookmark(bookmarkFolder, spot);
 
-        bookmarkFolder.addBookmark(bookmarkRepository.save(Bookmark.builder()
-                .bookmarkFolder(bookmarkFolder)
-                .spot(spot)
-                .build()));
-
-        return SpotResponse.builder()
-                .spot(spot)
+        return BookmarkResponse.builder()
+                .bookmark(bookmarkFolder.addBookmark(bookmarkRepository.save(Bookmark.builder()
+                        .bookmarkFolder(bookmarkFolder)
+                        .spot(spot)
+                        .build())))
                 .build();
     }
 
     /*
     북마크 리스트 조회 로직
      */
-    public List<SpotResponse> getBookmarks(Long bookmarkFolderId, String email) {
+    public List<BookmarkResponse> getBookmarks(Long bookmarkFolderId, String email) {
         BookmarkFolder bookmarkFolder = bookmarkFolderRepository.findById(bookmarkFolderId).orElseThrow(
                 () -> new BookmarkException(BookmarkErrorCode.BOOKMARK_FOLDER_NOT_FOUND)
         );
@@ -123,8 +120,22 @@ public class BookmarkService {
 
         // 페치 조인을 사용하여 북마크 폴더에 포함된 북마크들과 관련된 여행지를 함께 조회
         return bookmarkRepository.findBookmarksByFolderWithSpot(bookmarkFolder).stream()
-                .map(bookmark -> new SpotResponse(bookmark.getSpot()))
-                .collect(Collectors.toList());
+                .map(BookmarkResponse::new)
+                .toList();
+    }
+
+    /*
+    북마크 삭제 로직
+     */
+    public void deleteBookmark(Long bookmarkId, String email) {
+        Bookmark bookmark = bookmarkRepository.findById(bookmarkId).orElseThrow(
+                () -> new BookmarkException(BookmarkErrorCode.BOOKMARK_NOT_FOUND)
+        );
+
+        // 해당 북마크 폴더가 유저의 소유가 맞는지 검사
+        validateUserAccess(bookmark.getBookmarkFolder(), email);
+
+        bookmarkRepository.delete(bookmark);
     }
 
     // 북마크 폴더 개수 제한 검증
