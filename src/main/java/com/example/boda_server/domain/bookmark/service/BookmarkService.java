@@ -167,6 +167,7 @@ public class BookmarkService {
         // 해당 북마크 폴더가 유저의 소유가 맞는지 검사
         validateUserAccess(bookmark.getBookmarkFolder(), email);
 
+        bookmark.getBookmarkFolder().removeBookmark(bookmark);
         bookmarkRepository.delete(bookmark);
     }
 
