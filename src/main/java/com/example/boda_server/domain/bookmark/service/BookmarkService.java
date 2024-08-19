@@ -58,4 +58,17 @@ public class BookmarkService {
                 .map(BookmarkFolderResponse::new)
                 .toList();
     }
+
+    /*
+    북마크 폴더 삭제 로직
+     */
+    public void deleteBookmarkFolder(Long bookmarkFolderId, String email) {
+        BookmarkFolder bookmarkFolder = bookmarkFolderRepository.findById(bookmarkFolderId).orElseThrow(
+                () -> new BookmarkException(BookmarkErrorCode.BOOKMARK_FOLDER_NOT_FOUND)
+        );
+        if (!bookmarkFolder.getUser().getEmail().equals(email)){
+            throw new BookmarkException(BookmarkErrorCode.CANNOT_DELETE_BOOKMARK_FOLDER);
+        }
+        bookmarkFolderRepository.delete(bookmarkFolder);
+    }
 }
