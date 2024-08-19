@@ -27,14 +27,11 @@ public class Spot {
 
     private String address;
 
-    private Long dataId; //데이터상 ID
-
     @Builder
-    public Spot(String name, String xCoord, String yCoord, String address, Long dataId) {
+    public Spot(String name, String xCoord, String yCoord, String address) {
         this.name = name;
         this.xCoord = xCoord;
         this.yCoord = yCoord;
         this.address = address;
-        this.dataId = dataId;
     }
 }
