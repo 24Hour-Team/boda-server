@@ -7,7 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
 
-public interface BookmarkRepository extends JpaRepository<Bookmark, Long> {
+public interface BookmarkRepository extends JpaRepository<Bookmark, Long>, BookmarkRepositoryCustom {
     Long countByBookmarkFolder(BookmarkFolder bookmarkFolder);
     Optional<Bookmark> findByBookmarkFolderAndSpot(BookmarkFolder bookmarkFolder, Spot spot);
 }

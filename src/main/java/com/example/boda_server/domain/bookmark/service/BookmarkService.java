@@ -23,6 +23,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -99,14 +100,31 @@ public class BookmarkService {
         // 해당 폴더에 이미 해당 여행지 북마크가 있는지 검사
         validateDuplicateBookmark(bookmarkFolder, spot);
 
-        bookmarkRepository.save(Bookmark.builder()
+        bookmarkFolder.addBookmark(bookmarkRepository.save(Bookmark.builder()
                 .bookmarkFolder(bookmarkFolder)
                 .spot(spot)
-                .build());
+                .build()));
 
         return SpotResponse.builder()
                 .spot(spot)
                 .build();
+    }
+
+    /*
+    북마크 리스트 조회 로직
+     */
+    public List<SpotResponse> getBookmarks(Long bookmarkFolderId, String email) {
+        BookmarkFolder bookmarkFolder = bookmarkFolderRepository.findById(bookmarkFolderId).orElseThrow(
+                () -> new BookmarkException(BookmarkErrorCode.BOOKMARK_FOLDER_NOT_FOUND)
+        );
+
+        // 해당 북마크 폴더가 유저의 소유가 맞는지 검사
+        validateUserAccess(bookmarkFolder, email);
+
+        // 페치 조인을 사용하여 북마크 폴더에 포함된 북마크들과 관련된 여행지를 함께 조회
+        return bookmarkRepository.findBookmarksByFolderWithSpot(bookmarkFolder).stream()
+                .map(bookmark -> new SpotResponse(bookmark.getSpot()))
+                .collect(Collectors.toList());
     }
 
     // 북마크 폴더 개수 제한 검증
