@@ -8,12 +8,12 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class BookmarkFolderCreateResponse {
+public class BookmarkFolderResponse {
     private Long id;
     private String name;
 
     @Builder
-    public BookmarkFolderCreateResponse(BookmarkFolder bookmarkFolder) {
+    public BookmarkFolderResponse(BookmarkFolder bookmarkFolder) {
         this.id = bookmarkFolder.getId();
         this.name = bookmarkFolder.getName();
     }
