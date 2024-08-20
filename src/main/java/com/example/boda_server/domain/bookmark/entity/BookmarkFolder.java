@@ -27,12 +27,22 @@ public class BookmarkFolder extends BaseTimeEntity {
     @JoinColumn(name = "user_id")
     private User user;
 
-    @OneToMany(mappedBy = "bookmarkFolder")
+    //북마크 폴더가 삭제되면 내부 북마크들도 삭제되도록
+    @OneToMany(mappedBy = "bookmarkFolder", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Bookmark> bookmarks = new ArrayList<>();
 
     @Builder
     public BookmarkFolder(String name, User user) {
         this.name = name;
         this.user = user;
+    }
+
+    public Bookmark addBookmark(Bookmark bookmark) {
+        bookmarks.add(bookmark);
+        return bookmark;
+    }
+
+    public void removeBookmark(Bookmark bookmark) {
+        bookmarks.remove(bookmark);
     }
 }
