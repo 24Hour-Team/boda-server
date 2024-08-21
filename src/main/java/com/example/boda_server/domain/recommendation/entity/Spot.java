@@ -2,7 +2,6 @@ package com.example.boda_server.domain.recommendation.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -15,7 +14,6 @@ import lombok.NoArgsConstructor;
 public class Spot {
 
     @Id
-    @GeneratedValue
     @Column(name = "spot_id")
     private Long id;
 
@@ -27,11 +25,15 @@ public class Spot {
 
     private String address;
 
+    private String cityName;
+
     @Builder
-    public Spot(String name, String xCoord, String yCoord, String address) {
+    public Spot(Long id, String name, String xCoord, String yCoord, String address, String cityName) {
+        this.id = id;
         this.name = name;
         this.xCoord = xCoord;
         this.yCoord = yCoord;
         this.address = address;
+        this.cityName = cityName;
     }
 }
