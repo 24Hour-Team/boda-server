@@ -1,5 +1,8 @@
 package com.example.boda_server.domain.recommendation.entity;
 
+import lombok.Getter;
+
+@Getter
 public enum Season {
     SPRING(0),
     SUMMER(1),
