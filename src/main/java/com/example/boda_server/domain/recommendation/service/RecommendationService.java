@@ -1,5 +1,8 @@
 package com.example.boda_server.domain.recommendation.service;
 
+import com.example.boda_server.domain.bookmark.entity.BookmarkFolder;
+import com.example.boda_server.domain.bookmark.exception.BookmarkErrorCode;
+import com.example.boda_server.domain.bookmark.exception.BookmarkException;
 import com.example.boda_server.domain.recommendation.dto.request.AIRecommendRequest;
 import com.example.boda_server.domain.recommendation.dto.request.RecommendationRequest;
 import com.example.boda_server.domain.recommendation.dto.response.SpotResponse;
@@ -105,10 +108,14 @@ public class RecommendationService {
     /**
      * 지난 추천 결과 조회 로직
      */
-    public List<SpotResponse> getRecommendedSpots(Long tourInformationId) {
-        return tourInformationRepository.findById(tourInformationId).orElseThrow(
-                        () -> new RecommendationException(RecommendationErrorCode.TOUR_INFORMATION_NOT_FOUND)
-                ).getRecommendedSpots().stream()
+    public List<SpotResponse> getRecommendedSpots(Long tourInformationId, String email) {
+        User user = userService.findUserByEmail(email);
+
+        TourInformation tourInformation = findTourInformationById(tourInformationId);
+
+        validateUserAccess(tourInformation, user);  // 사용자 접근 권한 검증
+
+        return tourInformation.getRecommendedSpots().stream()
                 .map(recommendedSpot -> SpotResponse.builder()
                         .spot(recommendedSpot.getSpot())
                         .build())
@@ -222,5 +229,22 @@ public class RecommendationService {
                     log.error("Spot not found with id: {}", spotId);
                     return new RecommendationException(RecommendationErrorCode.SPOT_NOT_FOUND);
                 });
+    }
+
+    // id로 여행 정보를 반환
+    private TourInformation findTourInformationById(Long tourInformationId) {
+        return tourInformationRepository.findById(tourInformationId)
+                .orElseThrow(() -> {
+                    log.error("TourInformation not found with id: {}", tourInformationId);
+                    return new RecommendationException(RecommendationErrorCode.TOUR_INFORMATION_NOT_FOUND);
+                });
+    }
+
+    // 사용자 접근 권한 검증
+    private void validateUserAccess(TourInformation tourInformation, User user) {
+        if(!tourInformation.getUser().equals(user)) {
+            log.warn("User: {} attempted to access tourInformation: {} which does not belong to them", user.getEmail(), tourInformation.getId());
+            throw new RecommendationException(RecommendationErrorCode.UNAUTHORIZED_RECOMMENDATION_ACCESS);
+        }
     }
 }
