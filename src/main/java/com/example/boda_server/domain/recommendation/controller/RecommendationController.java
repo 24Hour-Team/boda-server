@@ -1,7 +1,7 @@
 package com.example.boda_server.domain.recommendation.controller;
 
 import com.example.boda_server.domain.recommendation.dto.request.RecommendationRequest;
-import com.example.boda_server.domain.recommendation.dto.response.RecommendationResponse;
+import com.example.boda_server.domain.recommendation.dto.response.SpotResponse;
 import com.example.boda_server.domain.recommendation.service.RecommendationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -16,7 +16,7 @@ public class RecommendationController {
     private final RecommendationService recommendationService;
 
     @PostMapping("/{email}")
-    public ResponseEntity<List<RecommendationResponse>> recommend(
+    public ResponseEntity<List<SpotResponse>> recommend(
             @RequestBody RecommendationRequest recommendationRequest,
             @PathVariable("email") String email
     ){

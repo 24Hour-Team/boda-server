@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class RecommendationResponse {
+public class SpotResponse {
     private Long spotId;
     private String name;
     private String xCoord; //위도
@@ -17,7 +17,7 @@ public class RecommendationResponse {
     private String cityName;
 
     @Builder
-    public RecommendationResponse(Spot spot) {
+    public SpotResponse(Spot spot) {
         this.spotId = spot.getId();
         this.name = spot.getName();
         this.xCoord = spot.getXCoord();

@@ -2,7 +2,7 @@ package com.example.boda_server.domain.recommendation.service;
 
 import com.example.boda_server.domain.recommendation.dto.request.AIRecommendRequest;
 import com.example.boda_server.domain.recommendation.dto.request.RecommendationRequest;
-import com.example.boda_server.domain.recommendation.dto.response.RecommendationResponse;
+import com.example.boda_server.domain.recommendation.dto.response.SpotResponse;
 import com.example.boda_server.domain.recommendation.dto.response.TourInformationResponse;
 import com.example.boda_server.domain.recommendation.entity.RecommendedSpot;
 import com.example.boda_server.domain.recommendation.entity.Spot;
@@ -48,7 +48,7 @@ public class RecommendationService {
     /**
      * 추천 로직 - AI 서버에 요청 후 응답 추천 결과는 저장(유저당 10개 제한)
      */
-    public List<RecommendationResponse> recommend(RecommendationRequest request, String email) {
+    public List<SpotResponse> recommend(RecommendationRequest request, String email) {
         User user = userService.findUserByEmail(email);
 
         AIRecommendRequest aiRecommendRequest = buildAIRecommendRequest(request, user);  // ai 요청 dto 생성
@@ -83,14 +83,14 @@ public class RecommendationService {
         });
 
         return spots.stream()
-                .map(spot -> RecommendationResponse.builder()
+                .map(spot -> SpotResponse.builder()
                         .spot(spot)
                         .build())
                 .toList();
     }
 
     /**
-     * 지난 추천 리스트 보기
+     * 지난 추천 리스트 조회 로직
      */
     public List<TourInformationResponse> getTourInformations(String email) {
         User user = userService.findUserByEmail(email);
@@ -100,6 +100,19 @@ public class RecommendationService {
                         .tourInformation(tourInformation)
                         .build()
                 ).toList();
+    }
+
+    /**
+     * 지난 추천 결과 조회 로직
+     */
+    public List<SpotResponse> getRecommendedSpots(Long tourInformationId, String email) {
+        return tourInformationRepository.findById(tourInformationId).orElseThrow(
+                        () -> new RecommendationException(RecommendationErrorCode.TOUR_INFORMATION_NOT_FOUND)
+                ).getRecommendedSpots().stream()
+                .map(recommendedSpot -> SpotResponse.builder()
+                        .spot(recommendedSpot.getSpot())
+                        .build())
+                .toList();
     }
 
     // ai 요청 dto 생성
