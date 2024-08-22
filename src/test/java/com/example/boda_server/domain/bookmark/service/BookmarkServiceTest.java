@@ -10,9 +10,9 @@ import com.example.boda_server.domain.bookmark.exception.BookmarkException;
 import com.example.boda_server.domain.bookmark.repository.BookmarkFolderRepository;
 import com.example.boda_server.domain.bookmark.repository.BookmarkRepository;
 import com.example.boda_server.domain.recommendation.entity.Spot;
-import com.example.boda_server.domain.recommendation.repository.SpotRepository;
+import com.example.boda_server.domain.recommendation.service.RecommendationService;
 import com.example.boda_server.domain.user.entity.User;
-import com.example.boda_server.domain.user.repository.UserRepository;
+import com.example.boda_server.domain.user.service.UserService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -38,10 +38,10 @@ class BookmarkServiceTest {
     private BookmarkFolderRepository bookmarkFolderRepository;
 
     @Mock
-    private UserRepository userRepository;
+    private UserService userService;
 
     @Mock
-    private SpotRepository spotRepository;
+    private RecommendationService recommendationService;
 
     @InjectMocks
     private BookmarkService bookmarkService;
@@ -73,7 +73,7 @@ class BookmarkServiceTest {
     @Test
     @DisplayName("북마크 폴더 생성 성공")
     void createBookmarkFolder_Success() {
-        when(userRepository.findByEmail(anyString())).thenReturn(Optional.of(user));
+        when(userService.findUserByEmail(anyString())).thenReturn(user);
         when(bookmarkFolderRepository.countByUser(any(User.class))).thenReturn(5L);
         when(bookmarkFolderRepository.save(any(BookmarkFolder.class))).thenReturn(bookmarkFolder);
 
@@ -88,7 +88,7 @@ class BookmarkServiceTest {
     @Test
     @DisplayName("북마크 폴더 생성 실패 - 폴더 개수 초과")
     void createBookmarkFolder_LimitExceeded() {
-        when(userRepository.findByEmail(anyString())).thenReturn(Optional.of(user));
+        when(userService.findUserByEmail(anyString())).thenReturn(user);
         when(bookmarkFolderRepository.countByUser(any(User.class))).thenReturn(10L);
 
         BookmarkException exception = assertThrows(BookmarkException.class, () ->
@@ -126,7 +126,7 @@ class BookmarkServiceTest {
     @DisplayName("북마크 생성 성공")
     void createBookmark_Success() {
         when(bookmarkFolderRepository.findById(anyLong())).thenReturn(Optional.of(bookmarkFolder));
-        when(spotRepository.findById(anyLong())).thenReturn(Optional.of(spot));
+        when(recommendationService.findSpotById(anyLong())).thenReturn(spot);  // 수정된 부분
         when(bookmarkRepository.countByBookmarkFolder(any(BookmarkFolder.class))).thenReturn(10L);
         when(bookmarkRepository.findByBookmarkFolderAndSpot(any(BookmarkFolder.class), any(Spot.class))).thenReturn(Optional.empty());
         when(bookmarkRepository.save(any(Bookmark.class))).thenReturn(bookmark);
@@ -141,7 +141,7 @@ class BookmarkServiceTest {
     @DisplayName("북마크 생성 실패 - 폴더에 북마크 개수 초과")
     void createBookmark_LimitExceeded() {
         when(bookmarkFolderRepository.findById(anyLong())).thenReturn(Optional.of(bookmarkFolder));
-        when(spotRepository.findById(anyLong())).thenReturn(Optional.of(spot));
+        when(recommendationService.findSpotById(anyLong())).thenReturn(spot);  // 수정된 부분
         when(bookmarkRepository.countByBookmarkFolder(any(BookmarkFolder.class))).thenReturn(20L);
 
         BookmarkException exception = assertThrows(BookmarkException.class, () ->

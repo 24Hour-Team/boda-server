@@ -1,5 +1,8 @@
 package com.example.boda_server.domain.user.entity;
 
+import lombok.Getter;
+
+@Getter
 public enum AgeRange {
     TWENTIES(20), //20대 이하
     THIRTIES(30),

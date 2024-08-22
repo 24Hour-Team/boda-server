@@ -35,7 +35,8 @@ public class TourInformation extends BaseTimeEntity {
     @JoinColumn(name = "user_id")
     private User user;
 
-    @OneToMany(mappedBy = "tourInformation")
+    //여행 정보가 삭제되면 추천 여행지도 삭제되도록
+    @OneToMany(mappedBy = "tourInformation", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<RecommendedSpot> recommendedSpots = new ArrayList<>();
 
     @Builder
@@ -44,5 +45,9 @@ public class TourInformation extends BaseTimeEntity {
         this.regionClassification = regionClassification;
         this.tourStyle = tourStyle;
         this.user = user;
+    }
+
+    public void addRecommendedSpot(RecommendedSpot recommendedSpot) {
+        recommendedSpots.add(recommendedSpot);
     }
 }

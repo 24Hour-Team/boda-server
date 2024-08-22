@@ -1,7 +1,12 @@
 package com.example.boda_server.domain.recommendation.repository;
 
 import com.example.boda_server.domain.recommendation.entity.TourInformation;
+import com.example.boda_server.domain.user.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface TourInformationRepository extends JpaRepository<TourInformation, Long> {
+import java.util.List;
+
+public interface TourInformationRepository extends JpaRepository<TourInformation, Long>, TourInformationRepositoryCustom {
+    List<TourInformation> findByUserOrderByCreatedDateTimeAsc(User user);
+    List<TourInformation> findByUser(User user);
 }

@@ -10,13 +10,9 @@ import com.example.boda_server.domain.bookmark.exception.BookmarkException;
 import com.example.boda_server.domain.bookmark.repository.BookmarkFolderRepository;
 import com.example.boda_server.domain.bookmark.repository.BookmarkRepository;
 import com.example.boda_server.domain.recommendation.entity.Spot;
-import com.example.boda_server.domain.recommendation.exception.RecommendationErrorCode;
-import com.example.boda_server.domain.recommendation.exception.RecommendationException;
-import com.example.boda_server.domain.recommendation.repository.SpotRepository;
+import com.example.boda_server.domain.recommendation.service.RecommendationService;
 import com.example.boda_server.domain.user.entity.User;
-import com.example.boda_server.domain.user.exception.UserErrorCode;
-import com.example.boda_server.domain.user.exception.UserException;
-import com.example.boda_server.domain.user.repository.UserRepository;
+import com.example.boda_server.domain.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -32,21 +28,16 @@ public class BookmarkService {
 
     private final BookmarkRepository bookmarkRepository;
     private final BookmarkFolderRepository bookmarkFolderRepository;
-    private final UserRepository userRepository;
-    private final SpotRepository spotRepository;
+    private final UserService userService;
+    private final RecommendationService recommendationService;
 
-    /*
-    북마크 폴더 생성 로직(유저당 최대 10개 제한)
+    /**
+     *북마크 폴더 생성 로직(유저당 최대 10개 제한)
      */
     public BookmarkFolderResponse createBookmarkFolder(BookmarkFolderCreateRequest request, String email) {
         log.info("Creating bookmark folder for user: {}", email);
 
-        User user = userRepository.findByEmail(email).orElseThrow(
-                () -> {
-                    log.error("User not found: {}", email);
-                    return new UserException(UserErrorCode.USER_NOT_FOUND);
-                }
-        );
+        User user = userService.findUserByEmail(email);
 
         //북마크 폴더가 10개 이상인지 검사
         validateBookmarkFolderLimit(user);
@@ -59,32 +50,24 @@ public class BookmarkService {
                 .build();
     }
 
-    /*
-    북마크 폴더 리스트 조회 로직
+    /**
+     *북마크 폴더 리스트 조회 로직
      */
     public List<BookmarkFolderResponse> getBookmarkFolders(String email) {
         log.info("Fetching bookmark folders for user: {}", email);
-        return bookmarkFolderRepository.findByUser(userRepository.findByEmail(email).orElseThrow(
-                        () -> {
-                            log.error("User not found: {}", email);
-                            return new UserException(UserErrorCode.USER_NOT_FOUND);
-                        }
-                )).stream()
+
+        return bookmarkFolderRepository.findByUser(userService.findUserByEmail(email)).stream()
                 .map(BookmarkFolderResponse::new)
                 .toList();
     }
 
-    /*
-    북마크 폴더 삭제 로직
+    /**
+     *북마크 폴더 삭제 로직
      */
     public void deleteBookmarkFolder(Long bookmarkFolderId, String email) {
         log.info("Deleting bookmark folder with id: {} for user: {}", bookmarkFolderId, email);
-        BookmarkFolder bookmarkFolder = bookmarkFolderRepository.findById(bookmarkFolderId).orElseThrow(
-                () -> {
-                    log.error("Bookmark folder not found with id: {}", bookmarkFolderId);
-                    return new BookmarkException(BookmarkErrorCode.BOOKMARK_FOLDER_NOT_FOUND);
-                }
-        );
+
+        BookmarkFolder bookmarkFolder = findBookmarkFolderById(bookmarkFolderId);
 
         // 해당 북마크 폴더가 유저의 소유가 맞는지 검사
         validateUserAccess(bookmarkFolder, email);
@@ -92,25 +75,14 @@ public class BookmarkService {
         bookmarkFolderRepository.delete(bookmarkFolder);
     }
 
-    /*
-    북마크 생성 로직(폴더당 최대 20개 제한)
+    /**
+     *북마크 생성 로직(폴더당 최대 20개 제한)
      */
     public BookmarkResponse createBookmark(Long bookmarkFolderId, Long spotId, String email) {
         log.info("Creating bookmark in folder: {} for spot: {} by user: {}", bookmarkFolderId, spotId, email);
 
-        BookmarkFolder bookmarkFolder = bookmarkFolderRepository.findById(bookmarkFolderId).orElseThrow(
-                () -> {
-                    log.error("Bookmark folder not found with id: {}", bookmarkFolderId);
-                    return new BookmarkException(BookmarkErrorCode.BOOKMARK_FOLDER_NOT_FOUND);
-                }
-        );
-
-        Spot spot = spotRepository.findById(spotId).orElseThrow(
-                () -> {
-                    log.error("Spot not found with id: {}", spotId);
-                    return new RecommendationException(RecommendationErrorCode.SPOT_NOT_FOUND);
-                }
-        );
+        BookmarkFolder bookmarkFolder = findBookmarkFolderById(bookmarkFolderId);
+        Spot spot = recommendationService.findSpotById(spotId);
 
         // 해당 북마크 폴더가 유저의 소유가 맞는지 검사
         validateUserAccess(bookmarkFolder, email);
@@ -129,18 +101,13 @@ public class BookmarkService {
                 .build();
     }
 
-    /*
-    북마크 리스트 조회 로직
+    /**
+     *북마크 리스트 조회 로직
      */
     public List<BookmarkResponse> getBookmarks(Long bookmarkFolderId, String email) {
         log.info("Fetching bookmarks for folder: {} by user: {}", bookmarkFolderId, email);
 
-        BookmarkFolder bookmarkFolder = bookmarkFolderRepository.findById(bookmarkFolderId).orElseThrow(
-                () -> {
-                    log.error("Bookmark folder not found with id: {}", bookmarkFolderId);
-                    return new BookmarkException(BookmarkErrorCode.BOOKMARK_FOLDER_NOT_FOUND);
-                }
-        );
+        BookmarkFolder bookmarkFolder = findBookmarkFolderById(bookmarkFolderId);
 
         // 해당 북마크 폴더가 유저의 소유가 맞는지 검사
         validateUserAccess(bookmarkFolder, email);
@@ -151,24 +118,37 @@ public class BookmarkService {
                 .toList();
     }
 
-    /*
-    북마크 삭제 로직
+    /**
+     *북마크 삭제 로직
      */
     public void deleteBookmark(Long bookmarkId, String email) {
         log.info("Deleting bookmark with id: {} by user: {}", bookmarkId, email);
 
-        Bookmark bookmark = bookmarkRepository.findById(bookmarkId).orElseThrow(
-                () -> {
-                    log.error("Bookmark not found with id: {}", bookmarkId);
-                    return new BookmarkException(BookmarkErrorCode.BOOKMARK_NOT_FOUND);
-                }
-        );
+        Bookmark bookmark = findBookmarkById(bookmarkId);
 
         // 해당 북마크 폴더가 유저의 소유가 맞는지 검사
         validateUserAccess(bookmark.getBookmarkFolder(), email);
 
         bookmark.getBookmarkFolder().removeBookmark(bookmark);
         bookmarkRepository.delete(bookmark);
+    }
+
+    // id로 북마크를 반환
+    private Bookmark findBookmarkById(Long bookmarkId) {
+        return bookmarkRepository.findById(bookmarkId)
+                .orElseThrow(() -> {
+                    log.error("Bookmark not found with id: {}", bookmarkId);
+                    return new BookmarkException(BookmarkErrorCode.BOOKMARK_NOT_FOUND);
+                });
+    }
+
+    // id로 북마크폴더를 반환
+    private BookmarkFolder findBookmarkFolderById(Long bookmarkFolderId) {
+        return bookmarkFolderRepository.findById(bookmarkFolderId)
+                .orElseThrow(() -> {
+                    log.error("Bookmark folder not found with id: {}", bookmarkFolderId);
+                    return new BookmarkException(BookmarkErrorCode.BOOKMARK_FOLDER_NOT_FOUND);
+                });
     }
 
     // 북마크 폴더 개수 제한 검증
