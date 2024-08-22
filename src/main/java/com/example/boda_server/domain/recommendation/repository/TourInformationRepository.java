@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
 
-public interface TourInformationRepository extends JpaRepository<TourInformation, Long> {
+public interface TourInformationRepository extends JpaRepository<TourInformation, Long>, TourInformationRepositoryCustom {
     List<TourInformation> findByUserOrderByCreatedDateTimeAsc(User user);
+    List<TourInformation> findByUser(User user);
 }

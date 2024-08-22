@@ -3,6 +3,7 @@ package com.example.boda_server.domain.recommendation.service;
 import com.example.boda_server.domain.recommendation.dto.request.AIRecommendRequest;
 import com.example.boda_server.domain.recommendation.dto.request.RecommendationRequest;
 import com.example.boda_server.domain.recommendation.dto.response.RecommendationResponse;
+import com.example.boda_server.domain.recommendation.dto.response.TourInformationResponse;
 import com.example.boda_server.domain.recommendation.entity.RecommendedSpot;
 import com.example.boda_server.domain.recommendation.entity.Spot;
 import com.example.boda_server.domain.recommendation.entity.TourInformation;
@@ -86,6 +87,19 @@ public class RecommendationService {
                         .spot(spot)
                         .build())
                 .toList();
+    }
+
+    /**
+     * 지난 추천 리스트 보기
+     */
+    public List<TourInformationResponse> getTourInformations(String email) {
+        User user = userService.findUserByEmail(email);
+
+        return tourInformationRepository.findByUserWithTourStyle(user).stream().map(
+                tourInformation -> TourInformationResponse.builder()
+                        .tourInformation(tourInformation)
+                        .build()
+                ).toList();
     }
 
     // ai 요청 dto 생성

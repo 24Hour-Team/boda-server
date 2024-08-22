@@ -47,12 +47,7 @@ public class TourInformation extends BaseTimeEntity {
         this.user = user;
     }
 
-    public RecommendedSpot addRecommendedSpot(RecommendedSpot recommendedSpot) {
+    public void addRecommendedSpot(RecommendedSpot recommendedSpot) {
         recommendedSpots.add(recommendedSpot);
-        return recommendedSpot;
-    }
-
-    public void removeRecommendedSpot(RecommendedSpot recommendedSpot) {
-        recommendedSpots.remove(recommendedSpot);
     }
 }

@@ -1,7 +1,5 @@
 package com.example.boda_server.domain.recommendation.dto.response;
 
-import com.example.boda_server.domain.recommendation.entity.RegionClassification;
-import com.example.boda_server.domain.recommendation.entity.Season;
 import com.example.boda_server.domain.recommendation.entity.Spot;
 import lombok.AccessLevel;
 import lombok.Builder;
