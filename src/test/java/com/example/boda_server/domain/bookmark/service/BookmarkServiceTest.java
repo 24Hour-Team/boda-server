@@ -11,6 +11,9 @@ import com.example.boda_server.domain.bookmark.repository.BookmarkFolderReposito
 import com.example.boda_server.domain.bookmark.repository.BookmarkRepository;
 import com.example.boda_server.domain.spot.entity.Spot;
 import com.example.boda_server.domain.spot.service.SpotService;
+import com.example.boda_server.domain.user.entity.AgeRange;
+import com.example.boda_server.domain.user.entity.Gender;
+import com.example.boda_server.domain.user.entity.Role;
 import com.example.boda_server.domain.user.entity.User;
 import com.example.boda_server.domain.user.service.UserService;
 import org.junit.jupiter.api.DisplayName;
@@ -54,6 +57,11 @@ class BookmarkServiceTest {
     @BeforeEach
     void setUp() {
         user = User.builder()
+                .role(Role.USER)
+                .nickname("nickname")
+                .gender(Gender.MALE)
+                .profileImageUrl("profileImageUrl")
+                .ageRange(AgeRange.TWENTIES)
                 .email("test@example.com")
                 .build();
 
@@ -64,6 +72,11 @@ class BookmarkServiceTest {
 
         spot = Spot.builder()
                 .id(1L)
+                .name("성산일출봉")
+                .xCoord("33.4592")
+                .yCoord("126.9427")
+                .address("제주특별자치도 서귀포시 성산읍")
+                .cityName("서귀포시")
                 .build();
 
         bookmark = Bookmark.builder()
