@@ -52,6 +52,7 @@ public class RecommendationService {
      * 추천 로직 - AI 서버에 요청 후 응답 추천 결과는 저장(유저당 10개 제한)
      */
     public List<SpotResponse> recommend(RecommendationRequest request, String email) {
+        log.info("Starting recommendation process for user: {}", email);
         User user = userService.findUserByEmail(email);
 
         AIRecommendRequest aiRecommendRequest = buildAIRecommendRequest(request, user);  // ai 요청 dto 생성
@@ -96,6 +97,7 @@ public class RecommendationService {
      * 지난 추천 리스트 조회 로직
      */
     public List<TourInformationResponse> getTourInformations(String email) {
+        log.info("Fetching tour information list for user: {}", email);
         User user = userService.findUserByEmail(email);
 
         return tourInformationRepository.findByUserWithTourStyle(user).stream().map(
@@ -109,6 +111,7 @@ public class RecommendationService {
      * 지난 추천 결과 조회 로직
      */
     public List<SpotResponse> getRecommendedSpots(Long tourInformationId, String email) {
+        log.info("Fetching recommended spots for tourInformationId: {} and user: {}", tourInformationId, email);
         User user = userService.findUserByEmail(email);
 
         TourInformation tourInformation = findTourInformationById(tourInformationId);
@@ -126,6 +129,7 @@ public class RecommendationService {
      * 여행지 상세 조회 로직
      */
     public SpotResponse getSpot(Long spotId) {
+        log.info("Fetching spot details for spotId: {}", spotId);
         return SpotResponse.builder()
                 .spot(spotRepository.findById(spotId).orElseThrow(
                         () -> new RecommendationException(RecommendationErrorCode.SPOT_NOT_FOUND)
@@ -218,6 +222,7 @@ public class RecommendationService {
             int excessCount = tourInformations.size() - 9; // 새로 추가될 TourInformation을 위해 하나를 남겨둠
             List<TourInformation> toDelete = tourInformations.subList(0, excessCount);
 
+            log.info("Deleting {} oldest TourInformation entries for user: {}", excessCount, user.getEmail());
             tourInformationRepository.deleteAll(toDelete);  // TourInformation만 삭제하면 RecommendedSpot도 자동 삭제
         }
     }
