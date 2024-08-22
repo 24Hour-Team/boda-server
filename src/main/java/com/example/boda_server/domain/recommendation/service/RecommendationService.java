@@ -50,12 +50,14 @@ public class RecommendationService {
     public List<RecommendationResponse> recommend(RecommendationRequest request, String email) {
         User user = userService.findUserByEmail(email);
 
-        AIRecommendRequest aiRecommendRequest = buildAIRecommendRequest(request, user);  // ai 요청 dto 생
+        AIRecommendRequest aiRecommendRequest = buildAIRecommendRequest(request, user);  // ai 요청 dto 생성
         List<String> areas = fetchRecommendationsFromAI(aiRecommendRequest);  // ai 서버로 요청 처리
 
         TourStyle tourStyle = findOrCreateTourStyle(request);  // 여행 취향 엔티티가 존재하면 반환 없으면 생성해서 반환
 
-        //여행 정보 저장
+        ensureMaxTenTourInformationForUser(user);  // 유저의 여행정보가 10개를 초과하는지 확인하고, 초과하면 가장 오래된 항목을 삭제
+
+        // 여행 정보 저장
         TourInformation tourInformation = tourInformationRepository.save(TourInformation.builder()
                 .tourStyle(tourStyle)
                 .regionClassification(request.getRegionClassification())
@@ -161,6 +163,18 @@ public class RecommendationService {
                     .build();
             return tourStyleRepository.save(newTourStyle);
         });
+    }
+
+     // 유저의 여행정보가 10개를 초과하는지 확인하고, 초과하면 가장 오래된 항목을 삭제
+    private void ensureMaxTenTourInformationForUser(User user) {
+        List<TourInformation> tourInformations = tourInformationRepository.findByUserOrderByCreatedDateTimeAsc(user);
+
+        if (tourInformations.size() >= 10) {
+            int excessCount = tourInformations.size() - 9; // 새로 추가될 TourInformation을 위해 하나를 남겨둠
+            List<TourInformation> toDelete = tourInformations.subList(0, excessCount);
+
+            tourInformationRepository.deleteAll(toDelete);  // TourInformation만 삭제하면 RecommendedSpot도 자동 삭제
+        }
     }
 
     // id로 여행지를 반환
