@@ -1,4 +1,4 @@
-package com.example.boda_server.domain.recommendation.entity;
+package com.example.boda_server.domain.spot.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

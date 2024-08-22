@@ -1,6 +1,6 @@
-package com.example.boda_server.domain.recommendation.repository;
+package com.example.boda_server.domain.spot.repository;
 
-import com.example.boda_server.domain.recommendation.entity.Spot;
+import com.example.boda_server.domain.spot.entity.Spot;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;

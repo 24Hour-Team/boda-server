@@ -1,6 +1,6 @@
 package com.example.boda_server.domain.bookmark.entity;
 
-import com.example.boda_server.domain.recommendation.entity.Spot;
+import com.example.boda_server.domain.spot.entity.Spot;
 import com.example.boda_server.global.model.BaseTimeEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;

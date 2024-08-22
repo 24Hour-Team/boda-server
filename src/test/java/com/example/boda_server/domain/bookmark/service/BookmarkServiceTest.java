@@ -9,8 +9,8 @@ import com.example.boda_server.domain.bookmark.exception.BookmarkErrorCode;
 import com.example.boda_server.domain.bookmark.exception.BookmarkException;
 import com.example.boda_server.domain.bookmark.repository.BookmarkFolderRepository;
 import com.example.boda_server.domain.bookmark.repository.BookmarkRepository;
-import com.example.boda_server.domain.recommendation.entity.Spot;
-import com.example.boda_server.domain.recommendation.service.RecommendationService;
+import com.example.boda_server.domain.spot.entity.Spot;
+import com.example.boda_server.domain.spot.service.SpotService;
 import com.example.boda_server.domain.user.entity.User;
 import com.example.boda_server.domain.user.service.UserService;
 import org.junit.jupiter.api.DisplayName;
@@ -41,7 +41,7 @@ class BookmarkServiceTest {
     private UserService userService;
 
     @Mock
-    private RecommendationService recommendationService;
+    private SpotService spotService;
 
     @InjectMocks
     private BookmarkService bookmarkService;
@@ -126,7 +126,7 @@ class BookmarkServiceTest {
     @DisplayName("북마크 생성 성공")
     void createBookmark_Success() {
         when(bookmarkFolderRepository.findById(anyLong())).thenReturn(Optional.of(bookmarkFolder));
-        when(recommendationService.findSpotById(anyLong())).thenReturn(spot);  // 수정된 부분
+        when(spotService.findSpotById(anyLong())).thenReturn(spot);  // 수정된 부분
         when(bookmarkRepository.countByBookmarkFolder(any(BookmarkFolder.class))).thenReturn(10L);
         when(bookmarkRepository.findByBookmarkFolderAndSpot(any(BookmarkFolder.class), any(Spot.class))).thenReturn(Optional.empty());
         when(bookmarkRepository.save(any(Bookmark.class))).thenReturn(bookmark);
@@ -141,7 +141,7 @@ class BookmarkServiceTest {
     @DisplayName("북마크 생성 실패 - 폴더에 북마크 개수 초과")
     void createBookmark_LimitExceeded() {
         when(bookmarkFolderRepository.findById(anyLong())).thenReturn(Optional.of(bookmarkFolder));
-        when(recommendationService.findSpotById(anyLong())).thenReturn(spot);  // 수정된 부분
+        when(spotService.findSpotById(anyLong())).thenReturn(spot);  // 수정된 부분
         when(bookmarkRepository.countByBookmarkFolder(any(BookmarkFolder.class))).thenReturn(20L);
 
         BookmarkException exception = assertThrows(BookmarkException.class, () ->

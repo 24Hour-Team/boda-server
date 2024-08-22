@@ -1,7 +1,7 @@
 package com.example.boda_server.domain.recommendation.controller;
 
 import com.example.boda_server.domain.recommendation.dto.request.RecommendationRequest;
-import com.example.boda_server.domain.recommendation.dto.response.SpotResponse;
+import com.example.boda_server.domain.spot.dto.response.SpotResponse;
 import com.example.boda_server.domain.recommendation.dto.response.TourInformationResponse;
 import com.example.boda_server.domain.recommendation.service.RecommendationService;
 import lombok.RequiredArgsConstructor;
@@ -40,13 +40,5 @@ public class RecommendationController {
     ){
         return ResponseEntity.ok()
                 .body(recommendationService.getRecommendedSpots(tourInformationId, email));
-    }
-
-    @GetMapping("/spot/{spotId}")
-    public ResponseEntity<SpotResponse> getSpot(
-            @PathVariable("spotId") Long spotId
-    ){
-        return ResponseEntity.ok()
-                .body(recommendationService.getSpot(spotId));
     }
 }

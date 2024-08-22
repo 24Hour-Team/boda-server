@@ -9,8 +9,8 @@ import com.example.boda_server.domain.bookmark.exception.BookmarkErrorCode;
 import com.example.boda_server.domain.bookmark.exception.BookmarkException;
 import com.example.boda_server.domain.bookmark.repository.BookmarkFolderRepository;
 import com.example.boda_server.domain.bookmark.repository.BookmarkRepository;
-import com.example.boda_server.domain.recommendation.entity.Spot;
-import com.example.boda_server.domain.recommendation.service.RecommendationService;
+import com.example.boda_server.domain.spot.entity.Spot;
+import com.example.boda_server.domain.spot.service.SpotService;
 import com.example.boda_server.domain.user.entity.User;
 import com.example.boda_server.domain.user.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -29,7 +29,7 @@ public class BookmarkService {
     private final BookmarkRepository bookmarkRepository;
     private final BookmarkFolderRepository bookmarkFolderRepository;
     private final UserService userService;
-    private final RecommendationService recommendationService;
+    private final SpotService spotService;
 
     /**
      *북마크 폴더 생성 로직(유저당 최대 10개 제한)
@@ -82,7 +82,7 @@ public class BookmarkService {
         log.info("Creating bookmark in folder: {} for spot: {} by user: {}", bookmarkFolderId, spotId, email);
 
         BookmarkFolder bookmarkFolder = findBookmarkFolderById(bookmarkFolderId);
-        Spot spot = recommendationService.findSpotById(spotId);
+        Spot spot = spotService.findSpotById(spotId);
 
         // 해당 북마크 폴더가 유저의 소유가 맞는지 검사
         validateUserAccess(bookmarkFolder, email);

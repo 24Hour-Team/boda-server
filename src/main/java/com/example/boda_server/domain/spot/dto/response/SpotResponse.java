@@ -1,6 +1,6 @@
-package com.example.boda_server.domain.recommendation.dto.response;
+package com.example.boda_server.domain.spot.dto.response;
 
-import com.example.boda_server.domain.recommendation.entity.Spot;
+import com.example.boda_server.domain.spot.entity.Spot;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
