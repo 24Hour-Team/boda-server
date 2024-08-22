@@ -105,7 +105,7 @@ public class RecommendationService {
     /**
      * 지난 추천 결과 조회 로직
      */
-    public List<SpotResponse> getRecommendedSpots(Long tourInformationId, String email) {
+    public List<SpotResponse> getRecommendedSpots(Long tourInformationId) {
         return tourInformationRepository.findById(tourInformationId).orElseThrow(
                         () -> new RecommendationException(RecommendationErrorCode.TOUR_INFORMATION_NOT_FOUND)
                 ).getRecommendedSpots().stream()
@@ -113,6 +113,17 @@ public class RecommendationService {
                         .spot(recommendedSpot.getSpot())
                         .build())
                 .toList();
+    }
+
+    /**
+     * 여행지 상세 조회 로직
+     */
+    public SpotResponse getSpot(Long spotId) {
+        return SpotResponse.builder()
+                .spot(spotRepository.findById(spotId).orElseThrow(
+                        () -> new RecommendationException(RecommendationErrorCode.SPOT_NOT_FOUND)
+                ))
+                .build();
     }
 
     // ai 요청 dto 생성
