@@ -11,6 +11,8 @@ import com.example.boda_server.domain.recommendation.entity.TourStyle;
 import com.example.boda_server.domain.recommendation.exception.RecommendationErrorCode;
 import com.example.boda_server.domain.recommendation.exception.RecommendationException;
 import com.example.boda_server.domain.recommendation.repository.RecommendedSpotRepository;
+import com.example.boda_server.domain.spot.exception.SpotErrorCode;
+import com.example.boda_server.domain.spot.exception.SpotException;
 import com.example.boda_server.domain.spot.repository.SpotRepository;
 import com.example.boda_server.domain.recommendation.repository.TourInformationRepository;
 import com.example.boda_server.domain.recommendation.repository.TourStyleRepository;
@@ -70,7 +72,7 @@ public class RecommendationService {
         // ai 응답으로 여행지 가져오기
         List<Spot> spots = areas.stream()
                 .map(area -> spotRepository.findByNameAndCityName(area, request.getRegionClassification().getLabel())
-                        .orElseThrow(() -> new RecommendationException(RecommendationErrorCode.SPOT_NOT_FOUND)))
+                        .orElseThrow(() -> new SpotException(SpotErrorCode.SPOT_NOT_FOUND)))
                 .toList();
 
         // 추천 여행지 결과 저장

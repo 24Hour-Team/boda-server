@@ -5,6 +5,8 @@ import com.example.boda_server.domain.recommendation.exception.RecommendationExc
 import com.example.boda_server.domain.spot.dto.response.SpotResponse;
 import com.example.boda_server.domain.spot.dto.response.SpotSearchResponse;
 import com.example.boda_server.domain.spot.entity.Spot;
+import com.example.boda_server.domain.spot.exception.SpotErrorCode;
+import com.example.boda_server.domain.spot.exception.SpotException;
 import com.example.boda_server.domain.spot.repository.SpotRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -28,7 +30,7 @@ public class SpotService {
         log.info("Fetching spot details for spotId: {}", spotId);
         return SpotResponse.builder()
                 .spot(spotRepository.findById(spotId).orElseThrow(
-                        () -> new RecommendationException(RecommendationErrorCode.SPOT_NOT_FOUND)
+                        () -> new SpotException(SpotErrorCode.SPOT_NOT_FOUND)
                 ))
                 .build();
     }
@@ -37,6 +39,8 @@ public class SpotService {
      * 여행지 검색 로직
      */
     public Page<SpotSearchResponse> searchSpots(String name, Pageable pageable) {
+        log.info("Searching spots with name containing '{}', page: {}, size: {}",
+                name, pageable.getPageNumber(), pageable.getPageSize());
         Page<Spot> spots = spotRepository.findByNameContaining(name, pageable);
         return spots.map(spot -> SpotSearchResponse.builder()
                 .spot(spot)
@@ -48,7 +52,7 @@ public class SpotService {
         return spotRepository.findById(spotId)
                 .orElseThrow(() -> {
                     log.error("Spot not found with id: {}", spotId);
-                    return new RecommendationException(RecommendationErrorCode.SPOT_NOT_FOUND);
+                    return new SpotException(SpotErrorCode.SPOT_NOT_FOUND);
                 });
     }
 }
