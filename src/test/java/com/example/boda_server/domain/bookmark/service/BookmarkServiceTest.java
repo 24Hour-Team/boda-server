@@ -62,7 +62,9 @@ class BookmarkServiceTest {
                 .user(user)
                 .build();
 
-        spot = Spot.builder().build();
+        spot = Spot.builder()
+                .id(1L)
+                .build();
 
         bookmark = Bookmark.builder()
                 .bookmarkFolder(bookmarkFolder)

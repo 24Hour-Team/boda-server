@@ -29,9 +29,7 @@ public class SpotService {
     public SpotResponse getSpot(Long spotId) {
         log.info("Fetching spot details for spotId: {}", spotId);
         return SpotResponse.builder()
-                .spot(spotRepository.findById(spotId).orElseThrow(
-                        () -> new SpotException(SpotErrorCode.SPOT_NOT_FOUND)
-                ))
+                .spot(findSpotById(spotId))
                 .build();
     }
 
