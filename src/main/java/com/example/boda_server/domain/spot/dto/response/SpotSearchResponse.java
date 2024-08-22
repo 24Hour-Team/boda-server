@@ -8,21 +8,15 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class SpotResponse {
+public class SpotSearchResponse {
     private Long id;
     private String name;
-    private String xCoord; //위도
-    private String yCoord; //경도
     private String address;
-    private String cityName;
 
     @Builder
-    public SpotResponse(Spot spot) {
+    public SpotSearchResponse(Spot spot) {
         this.id = spot.getId();
         this.name = spot.getName();
-        this.xCoord = spot.getXCoord();
-        this.yCoord = spot.getYCoord();
         this.address = spot.getAddress();
-        this.cityName = spot.getCityName();
     }
 }
