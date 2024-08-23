@@ -4,7 +4,6 @@ package com.example.boda_server.domain.auth.service;
 import com.example.boda_server.domain.auth.dto.CustomOAuth2User;
 import com.example.boda_server.domain.auth.dto.OAuth2Response;
 import com.example.boda_server.domain.user.entity.User;
-import com.example.boda_server.domain.user.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
@@ -18,8 +17,6 @@ import java.util.Map;
 @Service
 @RequiredArgsConstructor
 public class CustomOAuth2UserService extends DefaultOAuth2UserService {
-
-    private final UserRepository userRepository;
 
     @Transactional
     @Override
@@ -37,7 +34,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         // 4. 유저 정보 dto 생성
         OAuth2Response oAuth2Response = OAuth2Response.of(registrationId, oAuth2UserAttributes);
 
-        // 5. 회원가입 및 로그인
+        // 5. 로그인을 통해 얻는 정보 엔티티로 변환
         User user = getOrSave(oAuth2Response);
 
         // 6. OAuth2User로 반환
@@ -45,9 +42,8 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
     }
 
     private User getOrSave(OAuth2Response oAuth2Response) {
-        User user = userRepository.findByEmail(oAuth2Response.getEmail())
-                .orElseGet(oAuth2Response::toEntity);
-        return userRepository.save(user);
+        User user = oAuth2Response.toEntity();
+        return user;
     }
 
 }
