@@ -1,8 +1,9 @@
 package com.example.boda_server.global.config;
 
+import com.example.boda_server.domain.auth.handler.KakaoLogoutHandler;
 import com.example.boda_server.domain.auth.handler.OAuthLoginSuccessHandler;
 import com.example.boda_server.domain.auth.service.CustomOAuth2UserService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -11,12 +12,12 @@ import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
 @EnableWebSecurity
+@RequiredArgsConstructor
 public class SecurityConfig {
 
-    @Autowired
-    private CustomOAuth2UserService customOAuth2UserService;
-    @Autowired
-    private OAuthLoginSuccessHandler oAuthLoginSuccessHandler;
+    private final CustomOAuth2UserService customOAuth2UserService;
+    private final OAuthLoginSuccessHandler oAuthLoginSuccessHandler;
+    private final KakaoLogoutHandler kakaoLogoutHandler;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -36,6 +37,15 @@ public class SecurityConfig {
                         .requestMatchers("/", "/oauth2/**", "/login/**").permitAll()
                         .anyRequest().authenticated()
                 );
+
+        http
+                .logout((logout) -> logout
+                        .logoutSuccessUrl("/")
+                        .clearAuthentication(true)
+                        .invalidateHttpSession(true)
+                        .deleteCookies("JSESSIONID")
+                        .addLogoutHandler(kakaoLogoutHandler)
+                        .permitAll());
 
         return http.build();
     }
