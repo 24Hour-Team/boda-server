@@ -2,6 +2,7 @@ package com.example.boda_server.domain.recommendation.service;
 
 import com.example.boda_server.domain.recommendation.dto.request.AIRecommendRequest;
 import com.example.boda_server.domain.recommendation.dto.request.RecommendationRequest;
+import com.example.boda_server.domain.recommendation.dto.response.RecommendationResponse;
 import com.example.boda_server.domain.spot.dto.response.SpotResponse;
 import com.example.boda_server.domain.recommendation.dto.response.TourInformationResponse;
 import com.example.boda_server.domain.recommendation.entity.RecommendedSpot;
@@ -50,7 +51,7 @@ public class RecommendationService {
     /**
      * 추천 로직 - AI 서버에 요청 후 응답 추천 결과는 저장(유저당 10개 제한)
      */
-    public List<SpotResponse> recommend(RecommendationRequest request, String email) {
+    public Long recommend(RecommendationRequest request, String email) {
         log.info("Starting recommendation process for user: {}", email);
         User user = userService.findUserByEmail(email);
 
@@ -85,11 +86,7 @@ public class RecommendationService {
             tourInformation.addRecommendedSpot(recommendedSpot);
         });
 
-        return spots.stream()
-                .map(spot -> SpotResponse.builder()
-                        .spot(spot)
-                        .build())
-                .toList();
+        return tourInformation.getId();
     }
 
     /**
@@ -109,7 +106,7 @@ public class RecommendationService {
     /**
      * 지난 추천 결과 조회 로직
      */
-    public List<SpotResponse> getRecommendedSpots(Long tourInformationId, String email) {
+    public RecommendationResponse getRecommendedSpots(Long tourInformationId, String email) {
         log.info("Fetching recommended spots for tourInformationId: {} and user: {}", tourInformationId, email);
         User user = userService.findUserByEmail(email);
 
@@ -117,11 +114,9 @@ public class RecommendationService {
 
         validateUserAccess(tourInformation, user);  // 사용자 접근 권한 검증
 
-        return tourInformation.getRecommendedSpots().stream()
-                .map(recommendedSpot -> SpotResponse.builder()
-                        .spot(recommendedSpot.getSpot())
-                        .build())
-                .toList();
+        return RecommendationResponse.builder()
+                .tourInformation(tourInformation)
+                .build();
     }
 
     // ai 요청 dto 생성

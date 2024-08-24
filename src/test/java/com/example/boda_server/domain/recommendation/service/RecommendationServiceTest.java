@@ -1,11 +1,11 @@
 package com.example.boda_server.domain.recommendation.service;
 
+import com.example.boda_server.domain.recommendation.dto.response.RecommendationResponse;
 import com.example.boda_server.domain.recommendation.dto.response.TourInformationResponse;
 import com.example.boda_server.domain.recommendation.entity.*;
 import com.example.boda_server.domain.recommendation.exception.RecommendationErrorCode;
 import com.example.boda_server.domain.recommendation.exception.RecommendationException;
 import com.example.boda_server.domain.recommendation.repository.TourInformationRepository;
-import com.example.boda_server.domain.spot.dto.response.SpotResponse;
 import com.example.boda_server.domain.spot.entity.Spot;
 import com.example.boda_server.domain.user.entity.AgeRange;
 import com.example.boda_server.domain.user.entity.Gender;
@@ -116,12 +116,12 @@ class RecommendationServiceTest {
         tourInformation.addRecommendedSpot(recommendedSpot);
 
         // Act
-        List<SpotResponse> response = recommendationService.getRecommendedSpots(1L, "test@example.com");
+        RecommendationResponse response = recommendationService.getRecommendedSpots(1L, "test@example.com");
 
         // Assert
         assertNotNull(response);
-        assertEquals(1, response.size());
-        assertEquals("성산일출봉", response.get(0).getName());
+        assertEquals(1, response.getSpotResponses().size());
+        assertEquals("성산일출봉", response.getSpotResponses().get(0).getName());
         verify(tourInformationRepository, times(1)).findById(anyLong());
     }
 
