@@ -8,7 +8,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
@@ -18,10 +18,10 @@ import java.io.IOException;
 import java.util.Map;
 
 @Component
+@RequiredArgsConstructor
 public class OAuthLoginSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 
-    @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
@@ -44,7 +44,7 @@ public class OAuthLoginSuccessHandler extends SimpleUrlAuthenticationSuccessHand
     }
 
         /**
-         * 사용자의 추가 정보가 필요한지 확인
+         * 사용자의 추가 정보가 필요한지 확인하는 로직
          */
         private boolean needsAdditionalInfo(String email) {
             User target = userRepository.findByEmail(email).orElse(null);

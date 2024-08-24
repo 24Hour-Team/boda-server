@@ -1,4 +1,4 @@
-package com.example.boda_server.domain.user.dto;
+package com.example.boda_server.domain.user.dto.request;
 
 import com.example.boda_server.domain.user.entity.AgeRange;
 import com.example.boda_server.domain.user.entity.Gender;
@@ -10,8 +10,8 @@ import lombok.Getter;
  */
 @Data
 @Getter
-public class UserPartialDto {
-    // 닉네임, 성별, 연령대, //역할
+public class UserPartialRequest {
+
     private String nickname;
     private Gender gender;
     private AgeRange ageRange;
