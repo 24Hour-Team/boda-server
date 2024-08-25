@@ -25,7 +25,7 @@ public class AuthService {
     public UserResponse register(HttpServletRequest http, UserPartialRequest userPartialRequest){
         HttpSession session = http.getSession();
         String email = (String) session.getAttribute(SessionConstants.OAUTH_EMAIL);
-        String profileUrl = (String) session.getAttribute(SessionConstants.OAUTH_PROFILE_URL);
+        String profileImageUrl = (String) session.getAttribute(SessionConstants.OAUTH_PROFILE_URL);
 
         User user = User.builder()
                 .email(email)
@@ -33,7 +33,7 @@ public class AuthService {
                 .gender(userPartialRequest.getGender())
                 .ageRange(userPartialRequest.getAgeRange())
                 .role(Role.USER)
-                .profileImageUrl(profileUrl)
+                .profileImageUrl(profileImageUrl)
                 .build();
 
         User created = userRepository.save(user);

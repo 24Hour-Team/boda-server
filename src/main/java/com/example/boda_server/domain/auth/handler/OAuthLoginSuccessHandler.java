@@ -9,6 +9,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
@@ -21,6 +22,9 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class OAuthLoginSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 
+    @Value("${app.frontend.url}")
+    private String frontendUrl;
+
     private final UserRepository userRepository;
 
     @Override
@@ -31,15 +35,15 @@ public class OAuthLoginSuccessHandler extends SimpleUrlAuthenticationSuccessHand
         String email = (String) account.get("email");
 
         Map<String, Object> profile = (Map<String, Object>) account.get("profile");
-        String profileUrl = (String) profile.get("profile_url");
+        String profileImageUrl = (String) profile.get("profile_image_url");
 
         if (needsAdditionalInfo(email)) {
             HttpSession session = request.getSession();
             session.setAttribute(SessionConstants.OAUTH_EMAIL, email);
-            session.setAttribute(SessionConstants.OAUTH_PROFILE_URL, profileUrl);
-            getRedirectStrategy().sendRedirect(request, response, "/register");
+            session.setAttribute(SessionConstants.OAUTH_PROFILE_URL, profileImageUrl);
+            getRedirectStrategy().sendRedirect(request, response, frontendUrl+"/register");
         } else {
-            getRedirectStrategy().sendRedirect(request, response, "/");
+            getRedirectStrategy().sendRedirect(request, response, frontendUrl+"/");
         }
     }
 
