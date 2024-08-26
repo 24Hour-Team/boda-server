@@ -1,5 +1,6 @@
 package com.example.boda_server.domain.user.service;
 
+import com.example.boda_server.domain.user.dto.response.UserResponse;
 import com.example.boda_server.domain.user.entity.User;
 import com.example.boda_server.domain.user.exception.UserErrorCode;
 import com.example.boda_server.domain.user.exception.UserException;
@@ -23,5 +24,19 @@ public class UserService {
                     log.error("User not found: {}", email);
                     return new UserException(UserErrorCode.USER_NOT_FOUND);
                 });
+    }
+
+    /**
+     * 사용자 정보 조회
+     * @return UserResponse 객체
+     */
+    public UserResponse getUser(String email){
+        User user = userRepository.findByEmail(email).orElseThrow(
+                () -> new UserException(UserErrorCode.USER_NOT_FOUND)
+        );
+        log.info("User: {}", user);
+        return UserResponse.builder()
+                .user(user)
+                .build();
     }
 }
