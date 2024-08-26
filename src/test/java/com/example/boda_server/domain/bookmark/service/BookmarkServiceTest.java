@@ -1,6 +1,7 @@
 package com.example.boda_server.domain.bookmark.service;
 
 import com.example.boda_server.domain.bookmark.dto.request.BookmarkFolderCreateRequest;
+import com.example.boda_server.domain.bookmark.dto.response.BookmarkDetailResponse;
 import com.example.boda_server.domain.bookmark.dto.response.BookmarkFolderResponse;
 import com.example.boda_server.domain.bookmark.dto.response.BookmarkResponse;
 import com.example.boda_server.domain.bookmark.entity.Bookmark;
@@ -173,10 +174,10 @@ class BookmarkServiceTest {
         when(bookmarkFolderRepository.findById(anyLong())).thenReturn(Optional.of(bookmarkFolder));
         when(bookmarkRepository.findBookmarksByFolderWithSpot(any(BookmarkFolder.class))).thenReturn(List.of(bookmark));
 
-        List<BookmarkResponse> responses = bookmarkService.getBookmarks(1L, user.getEmail());
+        BookmarkDetailResponse responses = bookmarkService.getBookmarks(1L, user.getEmail());
 
-        assertFalse(responses.isEmpty());
-        assertEquals(1, responses.size());
+        assertFalse(responses.getBookmarks().isEmpty());
+        assertEquals(1, responses.getBookmarks().size());
     }
 
     @Test

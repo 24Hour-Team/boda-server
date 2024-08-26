@@ -1,6 +1,7 @@
 package com.example.boda_server.domain.bookmark.service;
 
 import com.example.boda_server.domain.bookmark.dto.request.BookmarkFolderCreateRequest;
+import com.example.boda_server.domain.bookmark.dto.response.BookmarkDetailResponse;
 import com.example.boda_server.domain.bookmark.dto.response.BookmarkFolderResponse;
 import com.example.boda_server.domain.bookmark.dto.response.BookmarkResponse;
 import com.example.boda_server.domain.bookmark.entity.Bookmark;
@@ -104,7 +105,7 @@ public class BookmarkService {
     /**
      *북마크 리스트 조회 로직
      */
-    public List<BookmarkResponse> getBookmarks(Long bookmarkFolderId, String email) {
+    public BookmarkDetailResponse getBookmarks(Long bookmarkFolderId, String email) {
         log.info("Fetching bookmarks for folder: {} by user: {}", bookmarkFolderId, email);
 
         BookmarkFolder bookmarkFolder = findBookmarkFolderById(bookmarkFolderId);
@@ -113,9 +114,10 @@ public class BookmarkService {
         validateUserAccess(bookmarkFolder, email);
 
         // 페치 조인을 사용하여 북마크 폴더에 포함된 북마크들과 관련된 여행지를 함께 조회
-        return bookmarkRepository.findBookmarksByFolderWithSpot(bookmarkFolder).stream()
-                .map(BookmarkResponse::new)
-                .toList();
+        return BookmarkDetailResponse.builder()
+                .bookmarkFolder(bookmarkFolder)
+                .bookmarks(bookmarkRepository.findBookmarksByFolderWithSpot(bookmarkFolder))
+                .build();
     }
 
     /**

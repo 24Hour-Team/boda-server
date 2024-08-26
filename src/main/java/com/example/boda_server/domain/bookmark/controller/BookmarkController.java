@@ -1,6 +1,7 @@
 package com.example.boda_server.domain.bookmark.controller;
 
 import com.example.boda_server.domain.bookmark.dto.request.BookmarkFolderCreateRequest;
+import com.example.boda_server.domain.bookmark.dto.response.BookmarkDetailResponse;
 import com.example.boda_server.domain.bookmark.dto.response.BookmarkFolderResponse;
 import com.example.boda_server.domain.bookmark.dto.response.BookmarkResponse;
 import com.example.boda_server.domain.bookmark.service.BookmarkService;
@@ -19,7 +20,7 @@ import java.util.List;
 public class BookmarkController {
     private final BookmarkService bookmarkService;
 
-    @PostMapping("/folder/create/{email}")
+    @PostMapping("/folder/{email}")
     public ResponseEntity<BookmarkFolderResponse> createBookmarkFolder(
             @RequestBody BookmarkFolderCreateRequest bookmarkFolderCreateRequest,
             @PathVariable("email") String email
@@ -28,7 +29,7 @@ public class BookmarkController {
                 .body(bookmarkService.createBookmarkFolder(bookmarkFolderCreateRequest, email));
     }
 
-    @GetMapping("/folder/{email}")
+    @GetMapping("/folder/list/{email}")
     public ResponseEntity<List<BookmarkFolderResponse>> getBookmarkFolders(
             @PathVariable("email") String email
     ){
@@ -45,7 +46,7 @@ public class BookmarkController {
         return ResponseEntity.noContent().build(); //상태 코드 204 반환
     }
 
-    @GetMapping("/create/{bookmarkFolderId}/{spotId}/{email}")
+    @GetMapping("/{bookmarkFolderId}/{spotId}/{email}")
     public ResponseEntity<BookmarkResponse> createBookmark(
             @PathVariable("bookmarkFolderId") Long bookmarkFolderId,
             @PathVariable("spotId") Long spotId,
@@ -56,7 +57,7 @@ public class BookmarkController {
     }
 
     @GetMapping("/{bookmarkFolderId}/{email}")
-    public ResponseEntity<List<BookmarkResponse>> getBookmarks(
+    public ResponseEntity<BookmarkDetailResponse> getBookmarks(
             @PathVariable("bookmarkFolderId") Long bookmarkFolderId,
             @PathVariable("email") String email
     ){
