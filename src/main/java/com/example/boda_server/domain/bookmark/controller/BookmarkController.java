@@ -1,5 +1,6 @@
 package com.example.boda_server.domain.bookmark.controller;
 
+import com.example.boda_server.domain.auth.dto.CustomOAuth2User;
 import com.example.boda_server.domain.bookmark.dto.request.BookmarkFolderCreateRequest;
 import com.example.boda_server.domain.bookmark.dto.response.BookmarkDetailResponse;
 import com.example.boda_server.domain.bookmark.dto.response.BookmarkFolderResponse;
@@ -7,6 +8,7 @@ import com.example.boda_server.domain.bookmark.dto.response.BookmarkResponse;
 import com.example.boda_server.domain.bookmark.service.BookmarkService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -20,57 +22,57 @@ import java.util.List;
 public class BookmarkController {
     private final BookmarkService bookmarkService;
 
-    @PostMapping("/folder/{email}")
+    @PostMapping("/folder")
     public ResponseEntity<BookmarkFolderResponse> createBookmarkFolder(
             @RequestBody BookmarkFolderCreateRequest bookmarkFolderCreateRequest,
-            @PathVariable("email") String email
+            @AuthenticationPrincipal CustomOAuth2User customOAuth2User
             ){
         return ResponseEntity.ok()
-                .body(bookmarkService.createBookmarkFolder(bookmarkFolderCreateRequest, email));
+                .body(bookmarkService.createBookmarkFolder(bookmarkFolderCreateRequest, customOAuth2User.getUser().getEmail()));
     }
 
-    @GetMapping("/folder/list/{email}")
+    @GetMapping("/folder/list")
     public ResponseEntity<List<BookmarkFolderResponse>> getBookmarkFolders(
-            @PathVariable("email") String email
+            @AuthenticationPrincipal CustomOAuth2User customOAuth2User
     ){
         return ResponseEntity.ok()
-                .body(bookmarkService.getBookmarkFolders(email));
+                .body(bookmarkService.getBookmarkFolders(customOAuth2User.getUser().getEmail()));
     }
 
-    @DeleteMapping("/folder/{bookmarkFolderId}/{email}")
+    @DeleteMapping("/folder/{bookmarkFolderId}")
     public ResponseEntity<Void> deleteBookmarkFolder(
             @PathVariable("bookmarkFolderId") Long bookmarkFolderId,
-            @PathVariable("email") String email
+            @AuthenticationPrincipal CustomOAuth2User customOAuth2User
     ){
-        bookmarkService.deleteBookmarkFolder(bookmarkFolderId, email);
+        bookmarkService.deleteBookmarkFolder(bookmarkFolderId, customOAuth2User.getUser().getEmail());
         return ResponseEntity.noContent().build(); //상태 코드 204 반환
     }
 
-    @GetMapping("/{bookmarkFolderId}/{spotId}/{email}")
+    @GetMapping("/{bookmarkFolderId}/{spotId}")
     public ResponseEntity<BookmarkResponse> createBookmark(
             @PathVariable("bookmarkFolderId") Long bookmarkFolderId,
             @PathVariable("spotId") Long spotId,
-            @PathVariable("email") String email
+            @AuthenticationPrincipal CustomOAuth2User customOAuth2User
     ){
         return ResponseEntity.ok()
-                .body(bookmarkService.createBookmark(bookmarkFolderId, spotId, email));
+                .body(bookmarkService.createBookmark(bookmarkFolderId, spotId, customOAuth2User.getUser().getEmail()));
     }
 
-    @GetMapping("/{bookmarkFolderId}/{email}")
+    @GetMapping("/{bookmarkFolderId}")
     public ResponseEntity<BookmarkDetailResponse> getBookmarks(
             @PathVariable("bookmarkFolderId") Long bookmarkFolderId,
-            @PathVariable("email") String email
+            @AuthenticationPrincipal CustomOAuth2User customOAuth2User
     ){
         return ResponseEntity.ok()
-                .body(bookmarkService.getBookmarks(bookmarkFolderId, email));
+                .body(bookmarkService.getBookmarks(bookmarkFolderId, customOAuth2User.getUser().getEmail()));
     }
 
-    @DeleteMapping("/{bookmarkId}/{email}")
+    @DeleteMapping("/{bookmarkId}")
     public ResponseEntity<Void> deleteBookmark(
             @PathVariable("bookmarkId") Long bookmarkId,
-            @PathVariable("email") String email
+            @AuthenticationPrincipal CustomOAuth2User customOAuth2User
     ){
-        bookmarkService.deleteBookmark(bookmarkId, email);
+        bookmarkService.deleteBookmark(bookmarkId, customOAuth2User.getUser().getEmail());
         return ResponseEntity.noContent().build(); //상태 코드 204 반환
     }
 }

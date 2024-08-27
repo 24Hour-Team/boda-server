@@ -34,7 +34,7 @@ public class UserService {
         User user = userRepository.findByEmail(email).orElseThrow(
                 () -> new UserException(UserErrorCode.USER_NOT_FOUND)
         );
-        log.info("User: {}", user);
+        log.info("Fetching user info: {}", user.getEmail());
         return UserResponse.builder()
                 .user(user)
                 .build();
