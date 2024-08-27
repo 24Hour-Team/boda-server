@@ -2,7 +2,7 @@ package com.example.boda_server.domain.bookmark.repository;
 
 import com.example.boda_server.domain.bookmark.entity.Bookmark;
 import com.example.boda_server.domain.bookmark.entity.BookmarkFolder;
-import com.example.boda_server.domain.recommendation.entity.Spot;
+import com.example.boda_server.domain.spot.entity.Spot;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;

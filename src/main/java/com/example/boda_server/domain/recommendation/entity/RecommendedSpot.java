@@ -1,5 +1,6 @@
 package com.example.boda_server.domain.recommendation.entity;
 
+import com.example.boda_server.domain.spot.entity.Spot;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;

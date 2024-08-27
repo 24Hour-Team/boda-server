@@ -1,6 +1,7 @@
 package com.example.boda_server.domain.bookmark.service;
 
 import com.example.boda_server.domain.bookmark.dto.request.BookmarkFolderCreateRequest;
+import com.example.boda_server.domain.bookmark.dto.response.BookmarkDetailResponse;
 import com.example.boda_server.domain.bookmark.dto.response.BookmarkFolderResponse;
 import com.example.boda_server.domain.bookmark.dto.response.BookmarkResponse;
 import com.example.boda_server.domain.bookmark.entity.Bookmark;
@@ -9,8 +10,11 @@ import com.example.boda_server.domain.bookmark.exception.BookmarkErrorCode;
 import com.example.boda_server.domain.bookmark.exception.BookmarkException;
 import com.example.boda_server.domain.bookmark.repository.BookmarkFolderRepository;
 import com.example.boda_server.domain.bookmark.repository.BookmarkRepository;
-import com.example.boda_server.domain.recommendation.entity.Spot;
-import com.example.boda_server.domain.recommendation.service.RecommendationService;
+import com.example.boda_server.domain.spot.entity.Spot;
+import com.example.boda_server.domain.spot.service.SpotService;
+import com.example.boda_server.domain.user.entity.AgeRange;
+import com.example.boda_server.domain.user.entity.Gender;
+import com.example.boda_server.domain.user.entity.Role;
 import com.example.boda_server.domain.user.entity.User;
 import com.example.boda_server.domain.user.service.UserService;
 import org.junit.jupiter.api.DisplayName;
@@ -41,7 +45,7 @@ class BookmarkServiceTest {
     private UserService userService;
 
     @Mock
-    private RecommendationService recommendationService;
+    private SpotService spotService;
 
     @InjectMocks
     private BookmarkService bookmarkService;
@@ -54,6 +58,11 @@ class BookmarkServiceTest {
     @BeforeEach
     void setUp() {
         user = User.builder()
+                .role(Role.USER)
+                .nickname("nickname")
+                .gender(Gender.MALE)
+                .profileImageUrl("profileImageUrl")
+                .ageRange(AgeRange.TWENTIES)
                 .email("test@example.com")
                 .build();
 
@@ -62,7 +71,14 @@ class BookmarkServiceTest {
                 .user(user)
                 .build();
 
-        spot = Spot.builder().build();
+        spot = Spot.builder()
+                .id(1L)
+                .name("성산일출봉")
+                .xCoord("33.4592")
+                .yCoord("126.9427")
+                .address("제주특별자치도 서귀포시 성산읍")
+                .cityName("서귀포시")
+                .build();
 
         bookmark = Bookmark.builder()
                 .bookmarkFolder(bookmarkFolder)
@@ -126,7 +142,7 @@ class BookmarkServiceTest {
     @DisplayName("북마크 생성 성공")
     void createBookmark_Success() {
         when(bookmarkFolderRepository.findById(anyLong())).thenReturn(Optional.of(bookmarkFolder));
-        when(recommendationService.findSpotById(anyLong())).thenReturn(spot);  // 수정된 부분
+        when(spotService.findSpotById(anyLong())).thenReturn(spot);  // 수정된 부분
         when(bookmarkRepository.countByBookmarkFolder(any(BookmarkFolder.class))).thenReturn(10L);
         when(bookmarkRepository.findByBookmarkFolderAndSpot(any(BookmarkFolder.class), any(Spot.class))).thenReturn(Optional.empty());
         when(bookmarkRepository.save(any(Bookmark.class))).thenReturn(bookmark);
@@ -141,7 +157,7 @@ class BookmarkServiceTest {
     @DisplayName("북마크 생성 실패 - 폴더에 북마크 개수 초과")
     void createBookmark_LimitExceeded() {
         when(bookmarkFolderRepository.findById(anyLong())).thenReturn(Optional.of(bookmarkFolder));
-        when(recommendationService.findSpotById(anyLong())).thenReturn(spot);  // 수정된 부분
+        when(spotService.findSpotById(anyLong())).thenReturn(spot);  // 수정된 부분
         when(bookmarkRepository.countByBookmarkFolder(any(BookmarkFolder.class))).thenReturn(20L);
 
         BookmarkException exception = assertThrows(BookmarkException.class, () ->
@@ -158,10 +174,10 @@ class BookmarkServiceTest {
         when(bookmarkFolderRepository.findById(anyLong())).thenReturn(Optional.of(bookmarkFolder));
         when(bookmarkRepository.findBookmarksByFolderWithSpot(any(BookmarkFolder.class))).thenReturn(List.of(bookmark));
 
-        List<BookmarkResponse> responses = bookmarkService.getBookmarks(1L, user.getEmail());
+        BookmarkDetailResponse responses = bookmarkService.getBookmarks(1L, user.getEmail());
 
-        assertFalse(responses.isEmpty());
-        assertEquals(1, responses.size());
+        assertFalse(responses.getBookmarks().isEmpty());
+        assertEquals(1, responses.getBookmarks().size());
     }
 
     @Test

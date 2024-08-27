@@ -8,6 +8,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class TourInformationResponse {
@@ -22,6 +24,7 @@ public class TourInformationResponse {
     private Boolean travelStyle6; //안유명한 vs 유명한
     private Boolean travelStyle7; //계획 vs 상황
     private Boolean travelStyle8; //사진중요 vs 사진안중요
+    private LocalDateTime createdDateTime;
 
     @Builder
     public TourInformationResponse(TourInformation tourInformation) {
@@ -36,5 +39,6 @@ public class TourInformationResponse {
         this.travelStyle6 = tourInformation.getTourStyle().getTravelStyle6();
         this.travelStyle7 = tourInformation.getTourStyle().getTravelStyle7();
         this.travelStyle8 = tourInformation.getTourStyle().getTravelStyle8();
+        this.createdDateTime = tourInformation.getCreatedDateTime();
     }
 }

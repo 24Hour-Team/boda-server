@@ -1,20 +1,20 @@
 package com.example.boda_server.domain.recommendation.service;
 
-import com.example.boda_server.domain.bookmark.entity.BookmarkFolder;
-import com.example.boda_server.domain.bookmark.exception.BookmarkErrorCode;
-import com.example.boda_server.domain.bookmark.exception.BookmarkException;
 import com.example.boda_server.domain.recommendation.dto.request.AIRecommendRequest;
 import com.example.boda_server.domain.recommendation.dto.request.RecommendationRequest;
-import com.example.boda_server.domain.recommendation.dto.response.SpotResponse;
+import com.example.boda_server.domain.recommendation.dto.response.RecommendationResponse;
+import com.example.boda_server.domain.spot.dto.response.SpotResponse;
 import com.example.boda_server.domain.recommendation.dto.response.TourInformationResponse;
 import com.example.boda_server.domain.recommendation.entity.RecommendedSpot;
-import com.example.boda_server.domain.recommendation.entity.Spot;
+import com.example.boda_server.domain.spot.entity.Spot;
 import com.example.boda_server.domain.recommendation.entity.TourInformation;
 import com.example.boda_server.domain.recommendation.entity.TourStyle;
 import com.example.boda_server.domain.recommendation.exception.RecommendationErrorCode;
 import com.example.boda_server.domain.recommendation.exception.RecommendationException;
 import com.example.boda_server.domain.recommendation.repository.RecommendedSpotRepository;
-import com.example.boda_server.domain.recommendation.repository.SpotRepository;
+import com.example.boda_server.domain.spot.exception.SpotErrorCode;
+import com.example.boda_server.domain.spot.exception.SpotException;
+import com.example.boda_server.domain.spot.repository.SpotRepository;
 import com.example.boda_server.domain.recommendation.repository.TourInformationRepository;
 import com.example.boda_server.domain.recommendation.repository.TourStyleRepository;
 import com.example.boda_server.domain.user.entity.User;
@@ -46,12 +46,12 @@ public class RecommendationService {
     private String aiUrl;
 
     private static final int TRAVEL_STYLE_TRUE_VALUE = 7;
-    private static final int TRAVEL_STYLE_FALSE_VALUE = 0;
+    private static final int TRAVEL_STYLE_FALSE_VALUE = 1;
 
     /**
      * 추천 로직 - AI 서버에 요청 후 응답 추천 결과는 저장(유저당 10개 제한)
      */
-    public List<SpotResponse> recommend(RecommendationRequest request, String email) {
+    public Long recommend(RecommendationRequest request, String email) {
         log.info("Starting recommendation process for user: {}", email);
         User user = userService.findUserByEmail(email);
 
@@ -73,7 +73,7 @@ public class RecommendationService {
         // ai 응답으로 여행지 가져오기
         List<Spot> spots = areas.stream()
                 .map(area -> spotRepository.findByNameAndCityName(area, request.getRegionClassification().getLabel())
-                        .orElseThrow(() -> new RecommendationException(RecommendationErrorCode.SPOT_NOT_FOUND)))
+                        .orElseThrow(() -> new SpotException(SpotErrorCode.SPOT_NOT_FOUND)))
                 .toList();
 
         // 추천 여행지 결과 저장
@@ -86,11 +86,7 @@ public class RecommendationService {
             tourInformation.addRecommendedSpot(recommendedSpot);
         });
 
-        return spots.stream()
-                .map(spot -> SpotResponse.builder()
-                        .spot(spot)
-                        .build())
-                .toList();
+        return tourInformation.getId();
     }
 
     /**
@@ -110,7 +106,7 @@ public class RecommendationService {
     /**
      * 지난 추천 결과 조회 로직
      */
-    public List<SpotResponse> getRecommendedSpots(Long tourInformationId, String email) {
+    public RecommendationResponse getRecommendedSpots(Long tourInformationId, String email) {
         log.info("Fetching recommended spots for tourInformationId: {} and user: {}", tourInformationId, email);
         User user = userService.findUserByEmail(email);
 
@@ -118,22 +114,8 @@ public class RecommendationService {
 
         validateUserAccess(tourInformation, user);  // 사용자 접근 권한 검증
 
-        return tourInformation.getRecommendedSpots().stream()
-                .map(recommendedSpot -> SpotResponse.builder()
-                        .spot(recommendedSpot.getSpot())
-                        .build())
-                .toList();
-    }
-
-    /**
-     * 여행지 상세 조회 로직
-     */
-    public SpotResponse getSpot(Long spotId) {
-        log.info("Fetching spot details for spotId: {}", spotId);
-        return SpotResponse.builder()
-                .spot(spotRepository.findById(spotId).orElseThrow(
-                        () -> new RecommendationException(RecommendationErrorCode.SPOT_NOT_FOUND)
-                ))
+        return RecommendationResponse.builder()
+                .tourInformation(tourInformation)
                 .build();
     }
 
@@ -225,15 +207,6 @@ public class RecommendationService {
             log.info("Deleting {} oldest TourInformation entries for user: {}", excessCount, user.getEmail());
             tourInformationRepository.deleteAll(toDelete);  // TourInformation만 삭제하면 RecommendedSpot도 자동 삭제
         }
-    }
-
-    // id로 여행지를 반환
-    public Spot findSpotById(Long spotId) {
-        return spotRepository.findById(spotId)
-                .orElseThrow(() -> {
-                    log.error("Spot not found with id: {}", spotId);
-                    return new RecommendationException(RecommendationErrorCode.SPOT_NOT_FOUND);
-                });
     }
 
     // id로 여행 정보를 반환

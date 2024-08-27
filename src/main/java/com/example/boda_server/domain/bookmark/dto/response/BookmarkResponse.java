@@ -1,7 +1,6 @@
 package com.example.boda_server.domain.bookmark.dto.response;
 
 import com.example.boda_server.domain.bookmark.entity.Bookmark;
-import com.example.boda_server.domain.recommendation.entity.Spot;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;

@@ -3,6 +3,7 @@ package com.example.boda_server.domain.recommendation.dto.request;
 import com.example.boda_server.domain.recommendation.entity.RegionClassification;
 import com.example.boda_server.domain.recommendation.entity.Season;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -20,6 +21,7 @@ public class RecommendationRequest {
     private Boolean travelStyle7; //계획 vs 상황
     private Boolean travelStyle8; //사진중요 vs 사진안중요
 
+    @Builder
     public RecommendationRequest(Season season, RegionClassification regionClassification, Boolean travelStyle1, Boolean travelStyle2, Boolean travelStyle3, Boolean travelStyle4, Boolean travelStyle5, Boolean travelStyle6, Boolean travelStyle7, Boolean travelStyle8) {
         this.season = season;
         this.regionClassification = regionClassification;
