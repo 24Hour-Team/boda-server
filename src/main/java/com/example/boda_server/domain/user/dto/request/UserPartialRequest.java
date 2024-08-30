@@ -15,4 +15,10 @@ public class UserPartialRequest {
     private String nickname;
     private Gender gender;
     private AgeRange ageRange;
+
+    public UserPartialRequest(String nickname, Gender gender, AgeRange ageRange) {
+        this.nickname = nickname;
+        this.gender = gender;
+        this.ageRange = ageRange;
+    }
 }

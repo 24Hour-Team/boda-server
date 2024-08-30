@@ -53,7 +53,8 @@ public class UserService {
 
         target.update(userPartialRequest);
         User updateUser = userRepository.save(target);
-        log.info("Updated user info: {}", updateUser.getNickname(), updateUser.getAgeRange(), updateUser.getGender());
+        log.info("Updated user info: nickname={}, ageRange={}, gender={}", updateUser.getNickname(), updateUser.getAgeRange(), updateUser.getGender());
+
         return UserResponse.builder()
                 .user(updateUser)
                 .build();
