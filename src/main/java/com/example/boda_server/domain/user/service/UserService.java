@@ -1,5 +1,6 @@
 package com.example.boda_server.domain.user.service;
 
+import com.example.boda_server.domain.user.dto.request.UserPartialRequest;
 import com.example.boda_server.domain.user.dto.response.UserResponse;
 import com.example.boda_server.domain.user.entity.User;
 import com.example.boda_server.domain.user.exception.UserErrorCode;
@@ -37,6 +38,25 @@ public class UserService {
         log.info("Fetching user info: {}", user.getEmail());
         return UserResponse.builder()
                 .user(user)
+                .build();
+    }
+
+    /**
+     * 사용자 정보 수정
+     * @return 수정된 UserResponse 객체
+     */
+    public UserResponse updateUser(String email, UserPartialRequest userPartialRequest) {
+
+        User target = userRepository.findByEmail(email).orElseThrow(
+                () -> new UserException(UserErrorCode.USER_NOT_FOUND)
+        );
+
+        target.update(userPartialRequest);
+        User updateUser = userRepository.save(target);
+        log.info("Updated user info: nickname={}, ageRange={}, gender={}", updateUser.getNickname(), updateUser.getAgeRange(), updateUser.getGender());
+
+        return UserResponse.builder()
+                .user(updateUser)
                 .build();
     }
 }

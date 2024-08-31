@@ -2,6 +2,7 @@ package com.example.boda_server.domain.user.entity;
 
 import com.example.boda_server.domain.bookmark.entity.BookmarkFolder;
 import com.example.boda_server.domain.recommendation.entity.TourInformation;
+import com.example.boda_server.domain.user.dto.request.UserPartialRequest;
 import com.example.boda_server.global.model.BaseTimeEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -51,5 +52,17 @@ public class User extends BaseTimeEntity {
         this.ageRange = ageRange;
         this.gender = gender;
         this.role = role;
+    }
+
+    public void update(UserPartialRequest request) {
+        if (request.getNickname() != null) {
+            this.nickname = request.getNickname();
+        }
+        if (request.getGender() != null) {
+            this.gender = request.getGender();
+        }
+        if (request.getAgeRange() != null) {
+            this.ageRange = request.getAgeRange();
+        }
     }
 }
