@@ -18,8 +18,8 @@ jobs:
       - name: show dir path
         run: |
           pwd
-          echo "Test sentence" > ./src/main/resourcestest.txt
-          ls -al
+          echo "Test sentence" > ./src/main/resources/test.txt
+          ls -R
           cat ./src/main/resources/test.txt
       
       # Java 설치
