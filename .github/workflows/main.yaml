@@ -18,7 +18,8 @@ jobs:
       - name: show dir path
         run: |
           pwd
-          echo "Test sentence" > ./main/resources/test.txt
+          echo "Test sentence" > test.txt
+          mv text.txt ./main/resources
           ls -al
           cat ./main/resources/test.txt
       
