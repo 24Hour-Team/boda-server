@@ -3,7 +3,7 @@ name: 벡엔드 CI/CD 워크플로우
 on:
   # main, develop 브랜치에 push, pull request가 발생했을 경우 실행
   push:
-    branches: [ ci, develop ]
+    branches: [ citest, develop ]
 
 jobs:
   build:
