@@ -15,8 +15,8 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v4
 
-      - name: List files
-        run: ls -R
+      - name: show dir path
+        run: pwd
       
       # Java 설치
       - name: Setup environment
@@ -25,7 +25,9 @@ jobs:
           distribution: 'corretto'
           java-version: '17'
           cache: 'gradle'
-          cache-dependency-path: '**/gradle-wrapper.properties'
+          cache-dependency-path: |
+            '**/*.gradle*',
+            '**/gradle-wrapper.properties'
 
       # Java 의존성 패키지 중 설치가 안 된 패키지나 변경된 패키지만 설치할 수 있도록 캐싱
       - name: Cache Gradle packages
@@ -76,7 +78,7 @@ jobs:
   #         cd boda-server &&
   #         chmod +x gradlew &&
   #         ./gradlew build &&
-  #         ./gradlew run
+  #         ./gradlew bootRun
   #         '
 
   #     # 배포 워크플로우 결과 알림
