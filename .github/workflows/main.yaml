@@ -18,10 +18,9 @@ jobs:
       - name: show dir path
         run: |
           pwd
-          echo "Test sentence" > test.txt
-          mv test.txt ./main/resources
+          echo "Test sentence" > ./src/main/resourcestest.txt
           ls -al
-          cat ./main/resources/test.txt
+          cat ./src/main/resources/test.txt
       
       # Java 설치
       - name: Setup environment
