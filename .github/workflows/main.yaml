@@ -19,7 +19,7 @@ jobs:
         run: |
           pwd
           echo "Test sentence" > test.txt
-          mv text.txt ./main/resources
+          mv test.txt ./main/resources
           ls -al
           cat ./main/resources/test.txt
       
