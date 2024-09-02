@@ -17,7 +17,7 @@ jobs:
 
       - name: show dir path
         run: |
-          pwd,
+          pwd
           echo "Test sentence" > test.txt
       
       # Java 설치
@@ -27,9 +27,7 @@ jobs:
           distribution: 'corretto'
           java-version: '17'
           cache: 'gradle'
-          cache-dependency-path: |
-            '**/*.gradle*',
-            '**/gradle-wrapper.properties'
+          cache-dependency-path: '**/gradle-wrapper.properties'
 
       # Java 의존성 패키지 중 설치가 안 된 패키지나 변경된 패키지만 설치할 수 있도록 캐싱
       - name: Cache Gradle packages
