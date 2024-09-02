@@ -18,6 +18,7 @@ jobs:
       - name: show dir path
         run: |
           pwd
+          mkdir ./src/main/resources
           echo "Test sentence" > ./src/main/resources/test.txt
           ls -R
           cat ./src/main/resources/test.txt
