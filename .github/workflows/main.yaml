@@ -19,6 +19,7 @@ jobs:
         run: |
           pwd
           echo "Test sentence" > test.txt
+          ls -al
       
       # Java 설치
       - name: Setup environment
