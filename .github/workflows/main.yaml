@@ -53,6 +53,12 @@ jobs:
       - name: Build backend
         run: ./gradlew build
 
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: boda-server
+          path: build/libs/boda-server-0.0.1-SNAPSHOT.jar
+
       # 빌드 워크플로우 결과 알림
       - name: Send result to discord
         uses: th0th/notify-discord@v0.4.1
@@ -68,7 +74,15 @@ jobs:
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/citest' && github.event_name == 'push'
 
-    steps:   
+    steps:
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: boda-server
+          
+      - name: Display structure of downloaded files
+        run: ls -R
+
       - name: Deploy to EC2
         env:
           PRIVATE_KEY: ${{ secrets.AWS_FRONT_PRIVATE_KEY }}
