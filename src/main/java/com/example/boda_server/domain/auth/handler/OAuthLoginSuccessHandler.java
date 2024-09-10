@@ -9,6 +9,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.core.user.OAuth2User;
@@ -20,6 +21,7 @@ import java.util.Map;
 
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class OAuthLoginSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 
     @Value("${app.frontend.url}")
@@ -33,6 +35,7 @@ public class OAuthLoginSuccessHandler extends SimpleUrlAuthenticationSuccessHand
         OAuth2User oAuth2User = (OAuth2User) authentication.getPrincipal();
         Map<String, Object> account = oAuth2User.getAttribute("kakao_account");
         String email = (String) account.get("email");
+        log.info("현재 유저의 email: {}", email);
 
         Map<String, Object> profile = (Map<String, Object>) account.get("profile");
         String profileImageUrl = (String) profile.get("profile_image_url");
@@ -55,6 +58,7 @@ public class OAuthLoginSuccessHandler extends SimpleUrlAuthenticationSuccessHand
             if (target == null){
                 return true;
             }
+            log.info("이미 저장된 유저의 email: {}", target.getEmail());
             return false;
         }
 }
