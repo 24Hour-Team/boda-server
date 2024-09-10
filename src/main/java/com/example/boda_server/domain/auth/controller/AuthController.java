@@ -15,7 +15,6 @@ public class AuthController {
 
     private final AuthService authService;
 
-    @CrossOrigin(origins="http://boda-travel.kro.kr", maxAge=3600)
     @PostMapping("/register")
     public ResponseEntity<UserResponse> register(HttpServletRequest http, @RequestBody UserPartialRequest userPartialRequest){
         UserResponse created = authService.register(http, userPartialRequest);

@@ -17,8 +17,7 @@ public class WebConfig implements WebMvcConfigurer {
                 .allowedOrigins(frontendUrl, "https://accounts.kakao.com")
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                 .allowedHeaders("*")
-                .allowCredentials(true)
-                .maxAge(3600);
+                .allowCredentials(true);
     }
 
 
