@@ -1,4 +1,4 @@
-FROM amazoncorretto:17-alpine AS builder
+FROM amazoncorretto:17 AS builder
 
 WORKDIR /boda-server
 
@@ -12,7 +12,7 @@ FROM amazoncorretto:17-alpine AS runner
 
 WORKDIR /boda-server
 
-COPY build/libs/boda-server-0.0.1-SNAPSHOT.jar .
+COPY --from=builder /boda-server/build/libs/boda-server-0.0.1-SNAPSHOT.jar .
 
 CMD [ "java", "-jar", "boda-server-0.0.1-SNAPSHOT.jar" ]
 
