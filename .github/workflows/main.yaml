@@ -1,0 +1,106 @@
+name: 벡엔드 CI/CD 워크플로우
+
+on:
+  # main, develop 브랜치에 push, pull request가 발생했을 경우 실행
+  push:
+    branches: [ citest, develop ]
+
+jobs:
+  build:
+    # 최신 우분투에서 실행
+    runs-on: ubuntu-latest
+    steps:
+      # 해당 repo를 체크아웃
+      # CI가 실행되는 클라우드에 clone 하는 것과 비슷한 작업
+      - name: Checkout repo
+        uses: actions/checkout@v4
+      
+      # Java 설치
+      - name: Setup environment
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'corretto'
+          java-version: '17'
+          cache: 'gradle'
+          cache-dependency-path: '**/gradle-wrapper.properties'
+
+      # Java 의존성 패키지 중 설치가 안 된 패키지나 변경된 패키지만 설치할 수 있도록 캐싱
+      - name: Cache Gradle packages
+        uses: actions/cache@v4
+        id: cache
+        with:
+          path: |
+            gradle/caches
+            gradle/wrapper
+          # 운영체제, gradle 파일, wrapper 속성 파일의 해시를 기반으로 키 생성
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          # 일치하는 키가 없을 때 사용할 대체 키 제공
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+
+      # gradlew에 실행 권한 부여
+      - name: Grant execute permission to gradlew
+        run: chmod +x gradlew
+
+      # - name: Add application info
+      #   env:
+      #     APPLICATION_INFO: ${{ secrets.JAVA_APPLICATION_INFO }}        
+      #   run: |
+      #     mkdir ./src/main/resources
+      #     echo "${APPLICATION_INFO} > ./src/main/resources/application.yaml
+
+      # Java app 빌드
+      - name: Build backend
+        run: ./gradlew build
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: boda-server
+          path: build/libs/boda-server-0.0.1-SNAPSHOT.jar
+
+      # 빌드 워크플로우 결과 알림
+      - name: Send result to discord
+        uses: th0th/notify-discord@v0.4.1
+        if: always()
+        env:
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          GITHUB_ACTOR: ${{ github.actor }}
+          GITHUB_JOB_NAME: "Build"
+          GITHUB_JOB_STATUS: ${{ job.status }}
+
+  deployment:
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/citest' && github.event_name == 'push'
+
+    steps:
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: boda-server
+          
+      - name: Display structure of downloaded files
+        run: ls -R
+
+      - name: Deploy to EC2
+        env:
+          PRIVATE_KEY: ${{ secrets.AWS_FRONT_PRIVATE_KEY }}
+          HOST: ${{ secrets.AWS_FRONT_IP }}
+          USER: ${{ secrets.AWS_USER }}
+        run: |
+          echo "${PRIVATE_KEY}" > private_key.pem && chmod 600 private_key.pem
+          scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i private_key.pem -r ./* ${USER}@${HOST}:/boda-server
+          ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i private_key.pem ${USER}@${HOST} '
+          cd boda-server &&
+          '
+
+      # 배포 워크플로우 결과 알림
+      - name: Send result to discord
+        uses: th0th/notify-discord@v0.4.1
+        if: always()
+        env:
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          GITHUB_ACTOR: ${{ github.actor }}
+          GITHUB_JOB_NAME: "Deployment"
+          GITHUB_JOB_STATUS: ${{ job.status }}
