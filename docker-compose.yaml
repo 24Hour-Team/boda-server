@@ -1,0 +1,10 @@
+services:
+  web:
+    image: aida0/boda-server
+    ports:
+      - target: 8080
+        published: 80
+        protocol: tcp
+      - target: 8080
+        published: 443
+        protocol: tcp
