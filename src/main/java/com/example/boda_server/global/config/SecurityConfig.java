@@ -34,7 +34,7 @@ public class SecurityConfig {
                         .successHandler(oAuthLoginSuccessHandler));
         http
                 .authorizeHttpRequests((auth) -> auth
-                        .requestMatchers("/", "/oauth2/**", "/login/**").permitAll()
+                        .requestMatchers("/", "/oauth2/**", "/login/**", "/api/v1/healthy-check").permitAll()
                         .anyRequest().authenticated()
                 );
 
