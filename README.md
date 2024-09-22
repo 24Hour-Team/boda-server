@@ -108,14 +108,14 @@
 #### Tool
 [![My Skills](https://skillicons.dev/icons?i=vscode,postman,figma)](https://skillicons.dev)
 <img src="https://github.com/user-attachments/assets/4189b9d0-ffd0-426a-a2b8-96a4ef391c08" width="50" height="50">
+## 📅개발 기간
+#### 2024년 07월 12일 ~ 2024년 08월 29일
+![스크린샷 2024-09-22 오후 11 41 23](https://github.com/user-attachments/assets/7b5f6153-eefa-4cd8-80f0-62f1926d29df)
 ## 💾ERD
 ![스크린샷 2024-09-09 오후 10 28 48](https://github.com/user-attachments/assets/dfc79ab4-ec2b-4436-87cb-fd0ee4699d22)
 ## 🌐시스템 아키텍처
 ![스크린샷 2024-09-22 오후 11 36 58](https://github.com/user-attachments/assets/7d391549-0592-45a4-8072-cdbfe3612a88)
 ![스크린샷 2024-09-22 오후 11 36 45](https://github.com/user-attachments/assets/2d896e27-c045-4231-a4bb-d8e14345ca6d)
-## 📅개발 기간
-#### 2024년 07월 12일 ~ 2024년 08월 29일
-![스크린샷 2024-09-22 오후 11 41 23](https://github.com/user-attachments/assets/7b5f6153-eefa-4cd8-80f0-62f1926d29df)
 ## 💻서비스 소개
 <img width="1906" alt="스크린샷 2024-09-10 오전 11 15 43" src="https://github.com/user-attachments/assets/a9c00d63-6e00-45c7-aedc-957b29544532">
 <img width="1911" alt="스크린샷 2024-09-10 오전 11 16 37" src="https://github.com/user-attachments/assets/2615144d-0bbf-4113-9090-848d7fb42d04">
