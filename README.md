@@ -123,6 +123,9 @@
 ![스크린샷 2024-09-22 오후 11 46 54](https://github.com/user-attachments/assets/a085350b-3d52-4873-895d-6dd8477523fa)
 ![스크린샷 2024-09-22 오후 11 47 16](https://github.com/user-attachments/assets/e693f7ab-3138-486f-b13c-55b95f649732)
 ![스크린샷 2024-09-22 오후 11 47 51](https://github.com/user-attachments/assets/b8b9b07a-44b1-48a2-9ef4-718dfc8eecd0)
+▶️ 유튜브 바로가기
+
+[![Video Label](http://img.youtube.com/vi/naQy2Cw5krk/0.jpg)](https://www.youtube.com/watch?v=naQy2Cw5krk)
 ## 🤖인공지능
 ![스크린샷 2024-09-22 오후 11 51 41](https://github.com/user-attachments/assets/6cfeb778-d764-42e7-bf22-77060eaa5940)
 ![스크린샷 2024-09-22 오후 11 51 51](https://github.com/user-attachments/assets/7e5e84ad-e56d-485f-9fdf-989a47fd0e8f)
