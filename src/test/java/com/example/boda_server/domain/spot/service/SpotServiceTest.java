@@ -75,13 +75,13 @@ class SpotServiceTest {
     void searchSpots_Success() {
         Pageable pageable = PageRequest.of(0, 10);
         Page<Spot> spots = new PageImpl<>(Collections.singletonList(spot));
-        when(spotRepository.findByNameContaining(anyString(), any(Pageable.class))).thenReturn(spots);
+        when(spotRepository.searchByName(anyString(), any(Pageable.class))).thenReturn(spots);
 
         Page<SpotSearchResponse> result = spotService.searchSpots("일출", pageable);
 
         assertNotNull(result);
         assertEquals(1, result.getTotalElements());
         assertEquals("성산일출봉", result.getContent().get(0).getName());
-        verify(spotRepository, times(1)).findByNameContaining("일출", pageable);
+        verify(spotRepository, times(1)).searchByName("일출", pageable);
     }
 }

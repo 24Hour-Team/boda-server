@@ -1,7 +1,5 @@
 package com.example.boda_server.domain.spot.service;
 
-import com.example.boda_server.domain.recommendation.exception.RecommendationErrorCode;
-import com.example.boda_server.domain.recommendation.exception.RecommendationException;
 import com.example.boda_server.domain.spot.dto.response.SpotResponse;
 import com.example.boda_server.domain.spot.dto.response.SpotSearchResponse;
 import com.example.boda_server.domain.spot.entity.Spot;
@@ -39,7 +37,7 @@ public class SpotService {
     public Page<SpotSearchResponse> searchSpots(String name, Pageable pageable) {
         log.info("Searching spots with name containing '{}', page: {}, size: {}",
                 name, pageable.getPageNumber(), pageable.getPageSize());
-        Page<Spot> spots = spotRepository.findByNameContaining(name, pageable);
+        Page<Spot> spots = spotRepository.searchByName(name, pageable);
         return spots.map(spot -> SpotSearchResponse.builder()
                 .spot(spot)
                 .build());
